@@ -1,0 +1,2017 @@
+asyncapi: 2.4.0
+defaultContentType: application/json
+info:
+  title: dxLink WebSocket
+  version: 1.0.2
+  description: |
+    ## Overview
+    dxLink.WebSocket is a WebSocket-based protocol that allows you to receive market data from dxFeed services.
+
+    ## Terminology
+    - **Connection** - an instance of the WebSocket connection
+    - **Client** - a side that initiates the connection
+    - **Server** - a side that accepts the connection
+    - **Message** - a frame of data sent over the WebSocket connection
+    - **Channel** - an independent virtual connection within a single WebSocket connection
+    - **Service** - a source that provides data
+
+    ## Communication
+    WebSocket doesn't provide built-in multi-channel support, so we have implemented it ourselves.
+    We provide the ability to work in virtual isolated channels within a single WebSocket connection.
+
+    ***In the AsyncAPI specification, one channel displays one specific WebSocket connection, so don't confuse the AsyncAPI channels with ours in this case.***
+
+    ## Messages
+    All messages are JSON objects with the following structure:
+    ```json
+    {
+      "type": "<MESSAGE_TYPE>",
+      "channel": <CHANNEL_ID>
+      // ...other fields
+    }
+    ```
+    - The `type` field is a string that contains the message type
+    - The `channel` field is a number that contains the ID of the channel to which the message belongs
+    - Other fields are the message's `payload`
+
+    The main channel performs the exchange of protocol messages that pertain to the entire connection (not to a specific channel). This main channel is identified by a channel ID `0`.
+
+    ## Error Handling
+    If an error occurs, the server will send an `ERROR` message to the client.
+    The client does not need to respond to the error message, as it is for informational purposes only.
+
+    The server can send the following error types:
+    - `UNSUPPORTED_PROTOCOL` - The server does not support the protocol version.
+    - `TIMEOUT` - the server did not receive the expected message within the allotted time period and considered that the connection was lost.
+    - `UNAUTHORIZED` - the client was not authorized for that action.
+    - `INVALID_MESSAGE` - the server was unable to parse the received message(s).
+    - `BAD_ACTION` - the server detected a protocol violation in the previously received message(s).
+    - `UNKNOWN` - an error occurred that does not fit into any of the previously described types.
+
+    Example of an error message:
+    ```json
+    {
+      "type": "ERROR",
+      "channel": 0,
+      "error": "TIMEOUT",
+      "message": "The timeout has been reached. The message was last received 60 seconds ago."
+    }
+    ```
+
+    ## Connection
+    The connection is established by sending a WebSocket connection request to the server.
+
+    After the connection is established, the client must send the `SETUP` message to the server within the connection timeout period. The server will then respond with the `SETUP` message containing its own settings.
+    
+    The `version` field contains the protocol version. The format is typically `<protocol-version>-<client-implementation>/<client-version>` (e.g., `"0.1-js/1.0.0"`).
+
+    ```json
+    {
+      "type": "SETUP",
+      "channel": 0,
+      "keepaliveTimeout": 60,
+      "acceptKeepaliveTimeout": 60,
+      "version": "0.1-js/1.0.0"
+    }
+    ```
+
+    ## Authentication
+    The authentication is performed by sending the `AUTH` message to the server after the `SETUP` exchange.
+    If the server requires authentication, it will send an `AUTH_STATE` message with `UNAUTHORIZED` state.
+    Authentication may not be required for all servers.
+    ```json
+    {
+      "type": "AUTH",
+      "channel": 0,
+      "token": "token#123"
+    }
+    ```
+
+    The server will notify the client with the `AUTH_STATE` message. The `state` field is set to `AUTHORIZED` or `UNAUTHORIZED`.
+    ```json
+    {
+      "type": "AUTH_STATE",
+      "channel": 0,
+      "state": "AUTHORIZED"
+    }
+    ```
+
+    ## Connection Maintenance
+    To prevent the connection from being closed due to inactivity:
+    - The client must send any message to the server before the server's `keepaliveTimeout` expires. The server's `keepaliveTimeout` is sent in the `SETUP` message from the server.
+    - The server must send any message to the client before the client's `keepaliveTimeout` expires. The client's `keepaliveTimeout` is sent in the `SETUP` message from the client.
+    If a client or server does not send any other messages, they can use the special message `KEEPALIVE`. Otherwise, the other side will close the connection.
+
+    ```json
+    {
+      "type": "KEEPALIVE",
+      "channel": 0
+    }
+    ```
+
+    ## Channel
+    The channel is a virtual connection created by the client and isolated from other channels.
+    The channel can be used to receive data from one of dxFeed's services.
+    
+    Channel lifecycle:
+    1. The client sends a `CHANNEL_REQUEST` message with the desired `service` and channel number
+    2. The server responds with a `CHANNEL_OPENED` message
+    3. The client and server exchange service-specific messages on this channel
+    4. The client sends a `CHANNEL_CANCEL` message to close the channel
+    5. The server responds with a `CHANNEL_CLOSED` message
+    
+    The client should use only odd channel numbers to send channel requests on the service channels.
+
+    ## `FEED` service
+    `FEED` - provides real-time access to the market events.
+
+    To open a channel, the client must send the `CHANNEL_REQUEST` message to the server with the `service` field set to `FEED`.
+    The server will respond with the `CHANNEL_OPENED` message.
+
+    ```json
+    {
+      "type": "CHANNEL_REQUEST",
+      "channel": 1,
+      "service": "FEED",
+      "parameters": {
+        "contract": "AUTO"
+      }
+    }
+    ```
+
+    ### Subscribe
+    To subscribe to data, the client must send the `FEED_SUBSCRIPTION` message to the server with the `add` field set to the desired symbol.
+    ```json
+    {
+      "type": "FEED_SUBSCRIPTION",
+      "channel": 1,
+      "add": [{ "symbol": "AAPL", "type": "Quote" }]
+    }
+    ```
+
+    ### Unsubscribe
+    To unsubscribe from data, the client must send the `FEED_SUBSCRIPTION` message to the server with the `remove` field set to the desired symbol.
+    Or send the `FEED_SUBSCRIPTION` message with the `reset` field set to `true`, which will unsubscribe from all symbols.
+    ```json
+    {
+      "type": "FEED_SUBSCRIPTION",
+      "channel": 1,
+      "remove": [{ "symbol": "AAPL", "type": "Quote" }]
+    }
+    ```
+
+    ### Data
+    The server will send the `FEED_DATA` message to the client with the `data` field set to the received events.
+    ```json
+    {
+      "type": "FEED_DATA",
+      "channel": 1,
+      "data": [
+        {
+          "eventSymbol": "AAPL",
+          "eventType": "Quote",
+          "bidPrice": 123.45,
+          "askPrice": 123.46,
+          "bidSize": 100,
+          "askSize": 200
+        }
+      ]
+    }
+    ```
+
+    ### Configuration
+    To configure the service, the client must send a `FEED_SETUP` message to the server with the acceptable configuration.
+    ```json
+    {
+      "type": "FEED_SETUP",
+      "channel": 1,
+      "acceptAggregationPeriod": 10,
+      "acceptDataFormat": "COMPACT",
+      "acceptEventFields": {
+        "Quote": ["eventType", "eventSymbol", "bidPrice", "askPrice", "bidSize", "askSize"]
+      }
+    }
+    ```
+    The server will notify the client with the `FEED_CONFIG` message containing the actual configuration.
+    ```json
+    {
+      "type": "FEED_CONFIG",
+      "channel": 1,
+      "aggregationPeriod": 10,
+      "dataFormat": "COMPACT",
+      "eventFields": {
+        "Quote": ["eventType", "eventSymbol", "bidPrice", "askPrice", "bidSize", "askSize"]
+      }
+    }
+    ```
+
+    ## `DOM` service
+
+    `DOM` - provides real-time access to depth of market service.
+
+    To open a channel, the client must send the `CHANNEL_REQUEST` message to the server with the `service` field set to `DOM` and desired parameters.
+    The server will respond with the `CHANNEL_OPENED` message.
+
+    ```json
+    {
+      "type": "CHANNEL_REQUEST",
+      "channel": 1,
+      "service": "DOM",
+      "parameters": {
+        "symbol": "AAPL",
+        "sources": ["ntv"]
+      }
+    }
+    ```
+
+    ### Configure
+    To start receiving the snapshot, the client must send the `DOM_SETUP` message first.
+    ```json
+    {
+      "type": "DOM_SETUP",
+      "channel": 1,
+    }
+    ```
+
+    ### Snapshot
+    The server will send the `DOM_SNAPSHOT` message to the client with the snapshot of the depth of market for desired symbol and sources.
+    ```json
+    {
+      "type": "DOM_SNAPSHOT",
+      "channel": 1,
+      "time": 1710262466056,
+      "bids": [
+        { "price": 172.33, "size": 376 },
+        { "price": 172.32, "size": 381 },
+        { "price": 172.31, "size": 405 },
+        { "price": 172.3, "size": 388 },
+        { "price": 172.29, "size": 356 }
+      ],
+      "asks": [
+        { "price": 172.34, "size": 165 },
+        { "price": 172.35, "size": 301 },
+        { "price": 172.36, "size": 300 },
+        { "price": 172.37, "size": 490 },
+        { "price": 172.38, "size": 608 }
+      ]
+    }
+    ```
+
+    ### Configuration
+    To start receiving snapshots and configure the service, the client must send a `DOM_SETUP` message to the server with the acceptable configuration.
+    ```json
+    {
+      "type": "DOM_SETUP",
+      "channel": 1,
+      "acceptAggregationPeriod": 10,
+      "acceptDepthLimit": 5,
+      "acceptDataFormat": "FULL",
+      "acceptOrderFields": ["price", "size"]
+    }
+    ```
+    The server will notify the client with the `DOM_CONFIG` message containing the actual configuration.
+    ```json
+    {
+      "type": "DOM_CONFIG",
+      "channel": 1,
+      "aggregationPeriod": 10,
+      "depthLimit": 5,
+      "dataFormat": "FULL",
+      "orderFields": ["price", "size"]
+    }
+    ```
+
+    ## Example
+    Real-world example of the protocol exchange:
+
+    ```
+    CONNECTED
+    // Connection establishment
+    CLIENT -> { "type": "SETUP", "channel": 0, "keepaliveTimeout": 60, "acceptKeepaliveTimeout": 60, "version": "1.0.0" }
+    SERVER <- { "type": "SETUP", "channel": 0, "keepaliveTimeout": 60, "acceptKeepaliveTimeout": 60, "version": "1.0.0" }
+
+    // Indicates that authorization is required
+    SERVER <- { "type": "AUTH_STATE", "channel": 0, "state": "UNAUTHORIZED" }
+
+    // Authorization
+    CLIENT -> { "type": "AUTH", "channel": 0, "token": "token#123" }
+    SERVER <- { "type": "AUTH_STATE", "channel": 0, "state": "AUTHORIZED" }
+
+    // Request a new channel for Quote events
+    CLIENT -> {
+      "type": "CHANNEL_REQUEST",
+      "channel": 1,
+      "service": "FEED",
+      "parameters": { "contract": "AUTO" }
+    }
+    SERVER <- {
+      "type": "CHANNEL_OPENED",
+      "channel": 1,
+      "service": "FEED",
+      "parameters": { "contract": "AUTO" }
+    }
+
+    // Subscribe to Quote events
+    CLIENT -> {
+      "type": "FEED_SUBSCRIPTION",
+      "channel": 1,
+      "add": [{ "symbol": "AAPL", "type": "Quote" }]
+    }
+
+    // Receive Quotes
+    SERVER <- {
+      "type": "FEED_CONFIG",
+      "channel": 1,
+      "eventFields": {
+        "Quote": ["eventSymbol", "eventType", "bidPrice", "askPrice", "bidSize", "askSize"]
+      }
+    }
+    SERVER <- {
+      "type": "FEED_DATA",
+      "channel": 1,
+      "data": [
+        {
+          "eventSymbol": "AAPL",
+          "eventType": "Quote",
+          "bidPrice": 123.45,
+          "askPrice": 123.46,
+          "bidSize": 100,
+          "askSize": 200
+        }
+      ]
+    }
+
+    // Close channel
+    CLIENT -> {
+      "type": "CHANNEL_CANCEL",
+      "channel": 1
+    }
+    SERVER <- {
+      "type": "CHANNEL_CLOSED",
+      "channel": 1
+    }
+
+    // Request a new channel for Candle events
+    CLIENT -> {
+      "type": "CHANNEL_REQUEST",
+      "channel": 3,
+      "service": "FEED",
+      "parameters": { "contract": "AUTO" }
+    }
+    SERVER <- {
+      "type": "CHANNEL_OPENED",
+      "channel": 3,
+      "service": "FEED",
+      "parameters": { "contract": "AUTO" }
+    }
+
+    // Subscribe to Candle events with time
+    CLIENT -> {
+      "type": "FEED_SUBSCRIPTION",
+      "channel": 3,
+      "add": [{ "symbol": "AAPL{=d}", "type": "Candle", "fromTime": 1666600000000 }]
+    }
+
+    // Receive Candle snapshot
+    SERVER <- {
+      "type": "FEED_CONFIG",
+      "channel": 3,
+      "eventFields": {
+        "Candle": ["eventSymbol", "eventType", "eventFlags", "open", "close"]
+      }
+    }
+    SERVER <- {
+      "type": "FEED_DATA",
+      "channel": 3,
+      "data": [
+        {
+          "eventSymbol": "AAPL{=d}",
+          "eventType": "Candle",
+          "eventFlags": 0,
+          "open": 123.45,
+          "close": 123.46
+        }
+      ]
+    }
+
+    ...
+
+    // Close channel
+    CLIENT -> {
+      "type": "CHANNEL_CANCEL",
+      "channel": 3
+    }
+    SERVER <- {
+      "type": "CHANNEL_CLOSED",
+      "channel": 3
+    }
+    DISCONNECTED
+    ```
+
+servers:
+  demo:
+    url: wss://demo.dxfeed.com/dxlink-ws
+    protocol: dxlink-ws
+    description: Demo server
+
+channels:
+  /:
+    description: The main entry point to receive and send messages.
+    bindings:
+      ws:
+        method: GET
+    subscribe:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/ErrorMessage"
+          - $ref: "#/components/messages/SetupMessage"
+          - $ref: "#/components/messages/KeepaliveMessage"
+          - $ref: "#/components/messages/AuthStateMessage"
+          - $ref: "#/components/messages/ChannelOpenedMessage"
+          - $ref: "#/components/messages/ChannelClosedMessage"
+          - $ref: "#/components/messages/FeedConfigMessage"
+          - $ref: "#/components/messages/FeedDataMessage"
+          - $ref: "#/components/messages/DomConfigMessage"
+          - $ref: "#/components/messages/DomSnapshotMessage"
+    publish:
+      message:
+        oneOf:
+          - $ref: "#/components/messages/ErrorMessage"
+          - $ref: "#/components/messages/SetupMessage"
+          - $ref: "#/components/messages/AuthMessage"
+          - $ref: "#/components/messages/KeepaliveMessage"
+          - $ref: "#/components/messages/FeedChannelRequestMessage"
+          - $ref: "#/components/messages/DomChannelRequestMessage"
+          - $ref: "#/components/messages/ChannelCancelMessage"
+          - $ref: "#/components/messages/FeedSetupMessage"
+          - $ref: "#/components/messages/FeedSubscriptionMessage"
+          - $ref: "#/components/messages/DomSetupMessage"
+
+components:
+  messages:
+    ErrorMessage:
+      summary: Error notification.
+      description: |
+        Receiving an error message does not require any action and is for informational purposes only.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: ERROR
+              error:
+                description: |
+                  Error type. Possible values:
+                  - UNSUPPORTED_PROTOCOL - does not support the protocol version
+                  - TIMEOUT - did not receive the expected message within the allotted time period and considered that the connection was lost
+                  - UNAUTHORIZED - the client was not authorized
+                  - INVALID_MESSAGE - when trying to process a received message(s), was unable to parse it correctly
+                  - BAD_ACTION - the server has detected a protocol violation in the previously received message(s).
+                  - UNKNOWN - an error occurred that does not fit into any of the previously described types.
+                type: string
+                enum:
+                  - UNSUPPORTED_PROTOCOL
+                  - TIMEOUT
+                  - UNAUTHORIZED
+                  - INVALID_MESSAGE
+                  - BAD_ACTION
+                  - UNKNOWN
+              message:
+                description: Contains the description or reason for the error.
+                type: string
+            required: [channel, type, error, message]
+      examples:
+        - summary: Timeout error
+          payload:
+            {
+              "channel": 0,
+              "type": "ERROR",
+              "error": "TIMEOUT",
+              "message": "The timeout has been reached. The message was last received 60 seconds ago.",
+            }
+        - summary: Invalid message error
+          payload:
+            {
+              "channel": 0,
+              "type": "ERROR",
+              "error": "INVALID_MESSAGE",
+              "message": "The message is not valid JSON.",
+            }
+
+    SetupMessage:
+      summary: Allows setting up connection.
+      description: |
+        The first message the client must send to the server after a successful connection.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              channel:
+                const: 0
+              type:
+                const: SETUP
+              keepaliveTimeout:
+                description: Time to disconnect the sender if no messages are received (in seconds).
+                type: number
+              acceptKeepaliveTimeout:
+                description: The desired time to disconnect the receiver if no messages are received (in seconds).
+                type: number
+              version:
+                description: Protocol version.
+                type: string
+                example: "0.1-js/1.0.0"
+            required: [channel, type, version]
+      examples:
+        - summary: Client setup message.
+          payload:
+            {
+              "channel": 0,
+              "type": "SETUP",
+              "keepaliveTimeout": 60,
+              "acceptKeepaliveTimeout": 60,
+              "version": "0.1-js/1.0.0",
+            }
+        - summary: Server setup message.
+          payload:
+            {
+              "channel": 0,
+              "type": "SETUP",
+              "keepaliveTimeout": 60,
+              "acceptKeepaliveTimeout": 60,
+              "version": "0.1-123-123",
+            }
+
+    KeepaliveMessage:
+      summary: Allows the connection to stay alive.
+      description: |
+        The client must send any messages to the server at least once before the timeout is reached (see `SETUP` message). Otherwise, the server will close the connection.
+        The server must send any messages to the client at least once before the timeout is reached (see `SETUP` message). Otherwise, the client should close the connection.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              channel:
+                const: 0
+              type:
+                const: KEEPALIVE
+            required: [channel, type]
+      examples:
+        - summary: Keepalive message
+          payload: { "channel": 0, "type": "KEEPALIVE" }
+
+    AuthMessage:
+      summary: Allows the client to authorize.
+      description: |
+        The client must send this message to the server after the connection is established and the `SETUP` is sent.
+        The server will notify with the `AUTH_STATE` message or close the connection if the authorization is unsuccessful.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              channel:
+                const: 0
+              type:
+                const: AUTH
+              token:
+                description: Authorization token.
+                type: string
+            required: [channel, type, token]
+      examples:
+        - summary: Authorization
+          payload: { "channel": 0, "type": "AUTH", "token": "token#123" }
+
+    AuthStateMessage:
+      summary: Notification of authorization state.
+      description: |
+        The server will send this message with an `UNAUTHORIZED state` to notify that authorization is required.
+        The server will send this message with an `AUTHORIZED state` to notify that authorization was successful or not required.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              channel:
+                const: 0
+              type:
+                const: AUTH_STATE
+              state:
+                description: |
+                  Authorization state. Possible values:
+                  - `AUTHORIZED` - authorization is successful
+                  - `UNAUTHORIZED` - authorization failed
+                type: string
+                enum:
+                  - AUTHORIZED
+                  - UNAUTHORIZED
+            required: [channel, type, state]
+      examples:
+        - summary: Authorization successful.
+          payload: { "channel": 0, "type": "AUTH_STATE", "state": "AUTHORIZED" }
+        - summary: Authorization required.
+          payload:
+            { "channel": 0, "type": "AUTH_STATE", "state": "UNAUTHORIZED" }
+
+    FeedChannelRequestMessage:
+      summary: Allows the client to request the feed channel.
+      description: |
+        The client can send this message to the server to open a channel for two-way communication with the service.
+        The server will notify the client with the `CHANNEL_OPENED` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: CHANNEL_REQUEST
+              service:
+                description: |
+                  Operated service. Possible values:
+                  - `FEED` - the feed service offers the ability to receive real-time updates about the trading information such as quotes, last traded price, volumes, and others.
+                enum:
+                  - FEED
+              parameters:
+                description: Parameters of the feed service.
+                type: object
+                properties:
+                  contract:
+                    $ref: "#/components/schemas/FeedContract"
+                required: [contract]
+            required: [channel, type, service, parameters]
+      examples:
+        - summary: Feed channel request with AUTO contract.
+          payload:
+            {
+              "channel": 1,
+              "type": "CHANNEL_REQUEST",
+              "service": "FEED",
+              "parameters": { "contract": "AUTO" },
+            }
+    DomChannelRequestMessage:
+      summary: Allows the client to request the dom channel.
+      description: |
+        The client can send this message to the server to open a channel for two-way communication with the service.
+        The server will notify the client with the `CHANNEL_OPENED` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: CHANNEL_REQUEST
+              service:
+                description: |
+                  Operated service. Possible values:
+                  - `DOM` - the dom service offers the ability to receive real-time updates about the depth of market.
+                enum:
+                  - DOM
+              parameters:
+                description: Parameters of the dom service.
+                type: object
+                properties:
+                  symbol:
+                    type: string
+                  sources:
+                    type: array
+                    items:
+                      description: Order source.
+                      examples: ["ntv"]
+                      type: string
+                required: [symbol, sources]
+            required: [channel, type, service, parameters]
+      examples:
+        - summary: Dom channel request.
+          payload:
+            {
+              "channel": 1,
+              "type": "CHANNEL_REQUEST",
+              "service": "DOM",
+              "parameters": { "symbol": "AAPL", "sources": ["ntv"] },
+            }
+
+    ChannelOpenedMessage:
+      summary: Notification of the opened channel.
+      description: |
+        The server will send this message to the client after the `CHANNEL_REQUEST` message is received.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: CHANNEL_OPENED
+              service:
+                enum:
+                  - FEED
+                  - DOM
+              parameters:
+                description: Parameters of operated channel.
+                type: object
+                required: []
+            required: [channel, type, service, parameters]
+      examples:
+        - summary: Feed channel opened with AUTO contract.
+          payload:
+            {
+              "channel": 1,
+              "type": "CHANNEL_OPENED",
+              "service": "FEED",
+              "parameters": { "contract": "AUTO" },
+            }
+        - summary: Dom channel opened.
+          payload:
+            {
+              "channel": 1,
+              "type": "CHANNEL_OPENED",
+              "service": "DOM",
+              "parameters": { "symbol": "AAPL", "sources": ["ntv"] },
+            }
+
+    ChannelClosedMessage:
+      summary: Notification of the closed channel.
+      description: |
+        The server will send this message to the client after the `CHANNEL_CANCEL` message is received or if the server decides to close the channel.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: CHANNEL_CLOSED
+            required: [channel, type]
+      examples:
+        - summary: Channel closed
+          payload: { "channel": 1, "type": "CHANNEL_CLOSED" }
+
+    ChannelCancelMessage:
+      summary: Allows the client to cancel channel requests.
+      description: |
+        The client can send this message to the server to close the channel.
+        Once the client has sent this message, the client can forget about the channel.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: CHANNEL_CANCEL
+            required: [channel, type]
+      examples:
+        - summary: Close channel
+          payload: { "channel": 1, "type": "CHANNEL_CANCEL" }
+
+    FeedSetupMessage:
+      summary: Allows the client to configure the `FEED` service.
+      description: |
+        The client can send this message to the server after opening a channel with the `FEED` service.
+        The server will notify the client of the application with the `FEED_CONFIG` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: FEED_SETUP
+              acceptAggregationPeriod:
+                description: Desired aggregation period of events (in seconds).
+                type: number
+              acceptEventFields:
+                $ref: "#/components/schemas/FeedEventFields"
+              acceptDataFormat:
+                $ref: "#/components/schemas/FeedDataFormat"
+            required: [channel, type]
+      examples:
+        - summary: Feed setup compact format with fields.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_SETUP",
+              "acceptAggregationPeriod": 1,
+              "acceptEventFields":
+                {
+                  "Quote":
+                    [
+                      "eventType",
+                      "eventSymbol",
+                      "bidPrice",
+                      "askPrice",
+                      "bidSize",
+                      "askSize",
+                    ],
+                },
+              "acceptDataFormat": "COMPACT",
+            }
+        - summary: Feed setup full format.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_SETUP",
+              "acceptAggregationPeriod": 1,
+              "acceptDataFormat": "FULL",
+            }
+
+    FeedConfigMessage:
+      summary: Notification of the `FEED` service configuration.
+      description: |
+        The server can send this message to the client after receiving the `FEED_SETUP` message.
+        The server can send this message to the client if the `FEED` service configuration has changed.
+        Parameters are lazy therefore the server may not send the notification immediately, but before the first `FEED_DATA` is sent.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: FEED_CONFIG
+              aggregationPeriod:
+                type: number
+              dataFormat:
+                $ref: "#/components/schemas/FeedDataFormat"
+              eventFields:
+                $ref: "#/components/schemas/FeedEventFields"
+            required: [channel, type, aggregationPeriod, dataFormat]
+      examples:
+        - summary: Feed config.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_CONFIG",
+              "aggregationPeriod": 1,
+              "eventFields":
+                {
+                  "Quote":
+                    [
+                      "eventType",
+                      "eventSymbol",
+                      "bidPrice",
+                      "askPrice",
+                      "bidSize",
+                      "askSize",
+                    ],
+                },
+              "dataFormat": "COMPACT",
+            }
+
+    FeedSubscriptionMessage:
+      summary: Allows the client to manage their subscriptions in the `FEED` service.
+      description: |
+        The client can send this message to the server after opening a channel with the `FEED` service.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: FEED_SUBSCRIPTION
+              add:
+                description: Operation to add subscription objects.
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/components/schemas/FeedSubscription"
+              remove:
+                description: Operation to remove subscription objects.
+                type: array
+                minItems: 1
+                items:
+                  $ref: "#/components/schemas/FeedSubscription"
+              reset:
+                description: Remove all subscription objects when it's `true`.
+                type: boolean
+            required: [channel, type]
+      examples:
+        - summary: Feed add subscription.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_SUBSCRIPTION",
+              "add": [{ "type": "Quote", "symbol": "AAPL" }],
+            }
+        - summary: Feed remove subscription.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_SUBSCRIPTION",
+              "remove": [{ "type": "Quote", "symbol": "AAPL" }],
+            }
+        - summary: Feed reset subscription
+          payload: { "channel": 1, "type": "FEED_SUBSCRIPTION", "reset": true }
+
+    FeedDataMessage:
+      summary: Contains the data of subscribed market events.
+      description: |
+        The server can send this message to the client after receiving the `FEED_SUBSCRIPTION` message.
+        The server will send data in the format that was described in the `FEED_CONFIG` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: FEED_DATA
+              events:
+                description: Batch of events.
+                oneOf:
+                  - description: |
+                      List of events in full mode.
+                      Empty fields are omitted from the json.
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FeedEvent"
+                    examples:
+                      - [
+                          {
+                            "eventSymbol": "AAPL",
+                            "eventType": "Quote",
+                            "askPrice": 123,
+                            "bidPrice": 123,
+                          },
+                          {
+                            "eventSymbol": "AAPL",
+                            "eventType": "Quote",
+                            "askPrice": 321,
+                            "bidPrice": 321,
+                          },
+                        ]
+                  - description: |
+                      List of events in compact mode.
+                      Elements alternate between event type (string) and value arrays for that event type.
+                    type: array
+                    items:
+                      oneOf:
+                        - description: Event type for decoding.
+                          type: string
+                        - description: Value only array for decoding.
+                          type: array
+                          items:
+                            oneOf:
+                              - type: string
+                              - type: number
+                    examples:
+                      - [
+                          "Quote",
+                          [
+                            "AAPL",
+                            "Quote",
+                            123,
+                            123,
+                            "AMZN",
+                            "Quote",
+                            321,
+                            321,
+                          ],
+                          "Trade",
+                          ["AAPL", "Trade", 321, 22, "AMZN", "Trade", 123, 11],
+                        ]
+            required: [channel, type, data]
+      examples:
+        - summary: Feed data full format.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_DATA",
+              "data":
+                [
+                  {
+                    "eventSymbol": "AAPL",
+                    "eventType": "Quote",
+                    "askPrice": 123,
+                    "bidPrice": 123,
+                  },
+                  {
+                    "eventSymbol": "AAPL",
+                    "eventType": "Quote",
+                    "askPrice": 321,
+                    "bidPrice": 321,
+                  },
+                ],
+            }
+        - summary: Feed data compact format.
+          payload:
+            {
+              "channel": 1,
+              "type": "FEED_DATA",
+              "data":
+                [
+                  "Quote",
+                  ["AAPL", "Quote", 123, 123, "AMZN", "Quote", 321, 321],
+                  "Trade",
+                  ["AAPL", "Trade", 321, 22, "AMZN", "Trade", 123, 11],
+                ],
+            }
+
+    DomSetupMessage:
+      summary: Allows the client to configure the `DOM` service.
+      description: |
+        The client can send this message to the server after opening a channel with the `DOM` service.
+        The server will notify the client of the application with the `DOM_CONFIG` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: DOM_SETUP
+              acceptAggregationPeriod:
+                description: Desired aggregation period of events (in seconds).
+                type: number
+              acceptDepthLimit:
+                description: Desired depth limit of order.
+                type: number
+              acceptOrderFields:
+                type: array
+                items:
+                  description: Order field name.
+                  examples: ["price", "size"]
+                  type: string
+              acceptDataFormat:
+                enum:
+                  - FULL
+            required: [channel, type]
+      examples:
+        - summary: Dom setup.
+          payload: { "channel": 1, "type": "DOM_SETUP" }
+        - summary: Dom setup with parameters.
+          payload:
+            {
+              "channel": 1,
+              "type": "DOM_SETUP",
+              "acceptAggregationPeriod": 1,
+              "acceptDepthLimit": 5,
+            }
+
+    DomConfigMessage:
+      summary: Notification of the `DOM` service configuration.
+      description: |
+        The server can send this message to the client after receiving the `DOM_SETUP` message.
+        The server can send this message to the client if the `DOM` service configuration has changed.
+        Parameters are lazy therefore the server may not send the notification immediately, but before the first `DOM_SNAPSHOT` is sent.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: DOM_CONFIG
+              aggregationPeriod:
+                description: Desired aggregation period of events (in seconds).
+                type: number
+              depthLimit:
+                description: Desired depth limit of order.
+                type: number
+              orderFields:
+                type: array
+                items:
+                  description: Order field name.
+                  examples: ["price", "size"]
+                  type: string
+              dataFormat:
+                enum:
+                  - FULL
+            required:
+              [
+                channel,
+                type,
+                aggregationPeriod,
+                depthLimit,
+                dataFormat,
+                orderFields,
+              ]
+      examples:
+        - summary: Dom config.
+          payload:
+            {
+              "channel": 1,
+              "type": "DOM_CONFIG",
+              "aggregationPeriod": 1,
+              "depthLimit": 5,
+              "dataFormat": "FULL",
+              "orderFields": ["price", "size"],
+            }
+
+    DomSnapshotMessage:
+      summary: Contains the snapshot of request depth of market.
+      description: |
+        The server will send snapshot in the format that was described in the `DOM_CONFIG` message.
+      payload:
+        allOf:
+          - $ref: "#/components/schemas/Message"
+          - type: object
+            properties:
+              type:
+                const: DOM_SNAPSHOT
+              time:
+                description: Snapshot acquisition time (unix timestamp in milliseconds)
+                type: number
+                example: 1710262466056
+              bids:
+                description: |
+                  List of bid orders.
+                  Empty fields are omitted from the json.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    price:
+                      type: number
+                    size:
+                      type: number
+                examples:
+                  - [
+                      { "price": 172.34, "size": 165 },
+                      { "price": 172.35, "size": 301 },
+                    ]
+              asks:
+                description: |
+                  List of ask orders.
+                  Empty fields are omitted from the json.
+                type: array
+                items:
+                  type: object
+                  properties:
+                    price:
+                      type: number
+                    size:
+                      type: number
+                examples:
+                  - [
+                      { "price": 172.34, "size": 165 },
+                      { "price": 172.35, "size": 301 },
+                    ]
+            required: [channel, type, time, bids, asks]
+      examples:
+        - summary: DOM Snapshot.
+          payload:
+            {
+              "type": "DOM_SNAPSHOT",
+              "channel": 1,
+              "time": 1710262466056,
+              "bids":
+                [
+                  { "price": 172.33, "size": 376 },
+                  { "price": 172.32, "size": 381 },
+                  { "price": 172.31, "size": 405 },
+                  { "price": 172.3, "size": 388 },
+                  { "price": 172.29, "size": 356 },
+                ],
+              "asks":
+                [
+                  { "price": 172.34, "size": 165 },
+                  { "price": 172.35, "size": 301 },
+                  { "price": 172.36, "size": 300 },
+                  { "price": 172.37, "size": 490 },
+                  { "price": 172.38, "size": 608 },
+                ],
+            }
+
+  schemas:
+    Message:
+      summary: The minimum unit of information
+      description: Supertype message.
+      type: object
+      properties:
+        type:
+          description: Message type discriminator.
+          type: string
+          example: "MESSAGE_TYPE"
+        channel:
+          description: Identifies within which channel the communication is occurring.
+          type: number
+          example: 1
+      discriminator: type
+      required: [type, channel]
+
+    FeedContract:
+      description: |
+        Subscription contract of the `FEED` service. Possible values:
+        - `HISTORY` - real-time history of events with snapshots (like Candles)
+        - `TICKER` - real-time ticker of events (like Quotes)
+        - `STREAM` - real-time stream of events (like Orders)
+        - `AUTO` - automatic selection of contract type depending on event type:
+          - `HISTORY` - for `Candle` event type and others
+          - `TICKER` - for `Quote` event type and others
+          - `STREAM` - for `Order` event type and others
+      type: string
+      enum:
+        - HISTORY
+        - TICKER
+        - STREAM
+        - AUTO
+
+    FeedEventFields:
+      description: An object where keys are event types and values are an array of event fields.
+      type: object
+      propertyNames:
+        description: Event type.
+        type: string
+        examples: ["Quote", "Trade", "Candle"]
+      additionalProperties:
+        description: Array of event fields.
+        type: array
+        items:
+          description: Event field name.
+          examples:
+            ["eventSymbol", "eventType", "eventTime", "askPrice", "bidPrice"]
+          type: string
+        minItems: 1
+
+    FeedDataFormat:
+      description: |
+        Format of data in `FEED_DATA` message. Possible values:
+        - `FULL` - key-value objects (with field names)
+        - `COMPACT` - value only arrays (without field names)
+      type: string
+      enum:
+        - FULL
+        - COMPACT
+
+    FeedSymbol:
+      description: |
+        Symbol of the subscription.
+        - `*` - wildcard (all symbols) subscription (for `STREAM` and `AUTO` contracts only)
+        - `symbol` - one symbol
+      type: string
+      examples: ["AAPL", "AMZN"]
+
+    FeedSubscription:
+      oneOf:
+        - $ref: "#/components/schemas/FeedRegularSubscription"
+        - $ref: "#/components/schemas/FeedOrderBookSubscription"
+        - $ref: "#/components/schemas/FeedTimeSeriesSubscription"
+
+    FeedRegularSubscription:
+      description: This type of subscription object is used in a channel with `TICKER`, `STREAM`, or `AUTO` contract.
+      type: object
+      properties:
+        type:
+          description: Type of market data event.
+          examples: ["Quote", "Trade", "Candle"]
+          type: string
+        symbol:
+          $ref: "#/components/schemas/FeedSymbol"
+      required: [type, symbol]
+      example: { "type": "Quote", "symbol": "AAPL" }
+
+    FeedOrderBookSubscription:
+      description: This type of subscription object is used in a channel with `HISTORY` or `AUTO` contract.
+      allOf:
+        - $ref: "#/components/schemas/FeedRegularSubscription"
+        - type: object
+          properties:
+            source:
+              description: Source of the feed. Possible values [here](https://kb.dxfeed.com/en/data-model/qd-model-of-market-events.html#order-x).
+              type: string
+              examples: ["NTV", "ntv", "DEFAULT"]
+          required: [type, symbol, source]
+          example: { "type": "Quote", "symbol": "AAPL", "source": "NTV" }
+
+    FeedTimeSeriesSubscription:
+      description: This type of subscription object is used in a channel with `HISTORY` or `AUTO` contract.
+      allOf:
+        - $ref: "#/components/schemas/FeedRegularSubscription"
+        - type: object
+          properties:
+            fromTime:
+              description: |
+                Timestamp (UNIX time) from when we want the data.
+
+                On `add`, new `fromTime` with the pair `type` and `symbol` will overwrite the previous subscription object.
+                On `remove`, the `fromTime` value is ignored but **mandatory**, pair `type`, and `symbol` will remove the previous subscription.
+              type: number
+              example: 1610000000000
+          required: [type, symbol, fromTime]
+          example:
+            {
+              "type": "Candle",
+              "symbol": "AAPL{=d}",
+              "fromTime": 1610000000000,
+            }
+
+    JSONDouble:
+      description: Represents a JSON number that can be either a floating-point number or a special value (NaN, Infinity, -Infinity).
+      oneOf:
+        - type: number
+        - type: string
+          const: "NaN"
+        - type: string
+          const: "Infinity"
+        - type: string
+          const: "-Infinity"
+      examples:
+        - 123.45
+        - "NaN"
+        - "Infinity"
+        - "-Infinity"
+
+    FeedEvent:
+      oneOf:
+        - $ref: "#/components/schemas/QuoteEvent"
+        - $ref: "#/components/schemas/ProfileEvent"
+        - $ref: "#/components/schemas/TradeEvent"
+        - $ref: "#/components/schemas/TradeETHEvent"
+        - $ref: "#/components/schemas/CandleEvent"
+        - $ref: "#/components/schemas/SummaryEvent"
+        - $ref: "#/components/schemas/TimeAndSaleEvent"
+        - $ref: "#/components/schemas/GreeksEvent"
+        - $ref: "#/components/schemas/TheoPriceEvent"
+        - $ref: "#/components/schemas/UnderlyingEvent"
+        - $ref: "#/components/schemas/OptionSaleEvent"
+        - $ref: "#/components/schemas/SeriesEvent"
+        - $ref: "#/components/schemas/OrderEvent"
+        - $ref: "#/components/schemas/SpreadOrderEvent"
+        - $ref: "#/components/schemas/AnalyticOrderEvent"
+        - $ref: "#/components/schemas/ConfigurationEvent"
+        - $ref: "#/components/schemas/MessageEvent"
+      discriminator: eventType
+
+    MessageEvent:
+      type: object
+      properties:
+        eventType:
+          const: Message
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+        attachment:
+          type: object
+
+    QuoteEvent:
+      description: |
+        Quote event is a snapshot of the best bid and ask prices, and other fields that change with each quote.
+        It represents the most recent information that is available about the best quote on the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Quote
+        sequence:
+          type: number
+        timeNanoPart:
+          type: number
+        bidTime:
+          type: number
+        bidExchangeCode:
+          type: string
+        bidPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        bidSize:
+          $ref: "#/components/schemas/JSONDouble"
+        askTime:
+          type: number
+        askExchangeCode:
+          type: string
+        askPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        askSize:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    ProfileEvent:
+      description: |
+        Profile information snapshot that contains security instrument description.
+        It represents the most recent information that is available about the traded security on the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Profile
+        description:
+          type: string
+        shortSaleRestriction:
+          type: string
+        tradingStatus:
+          type: string
+        statusReason:
+          type: string
+        haltStartTime:
+          type: number
+        haltEndTime:
+          type: number
+        highLimitPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        lowLimitPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        high52WeekPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        low52WeekPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        beta:
+          $ref: "#/components/schemas/JSONDouble"
+        earningsPerShare:
+          $ref: "#/components/schemas/JSONDouble"
+        dividendFrequency:
+          $ref: "#/components/schemas/JSONDouble"
+        exDividendAmount:
+          $ref: "#/components/schemas/JSONDouble"
+        exDividendDayId:
+          type: number
+        shares:
+          $ref: "#/components/schemas/JSONDouble"
+        freeFloat:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    GreeksEvent:
+      description: |
+        Greeks event is a snapshot of the option price, Black-Scholes volatility and greeks.
+        It represents the most recent information that is available about the corresponding values on the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Greeks
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        sequence:
+          type: number
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        volatility:
+          $ref: "#/components/schemas/JSONDouble"
+        delta:
+          $ref: "#/components/schemas/JSONDouble"
+        gamma:
+          $ref: "#/components/schemas/JSONDouble"
+        theta:
+          $ref: "#/components/schemas/JSONDouble"
+        rho:
+          $ref: "#/components/schemas/JSONDouble"
+        vega:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    SummaryEvent:
+      description: |
+        Summary information snapshot about the trading session including session highs, lows, etc.
+        It represents the most recent information that is available about the trading session in the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Summary
+        dayId:
+          type: number
+        dayOpenPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        dayHighPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        dayLowPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        dayClosePrice:
+          $ref: "#/components/schemas/JSONDouble"
+        dayClosePriceType:
+          type: string
+        prevDayId:
+          type: number
+        prevDayClosePrice:
+          $ref: "#/components/schemas/JSONDouble"
+        prevDayClosePriceType:
+          type: string
+        prevDayVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        openInterest:
+          type: number
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    CandleEvent:
+      description: |
+        Candle event with open, high, low, close prices and other information for a specific period.
+        Event symbol of the candle is represented with Candle symbol. Since the Candle is a time-series event, it is typically subscribed by `TimeSeriesSubscription` to specify a subscription time range.
+      type: object
+      properties:
+        eventType:
+          const: Candle
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        sequence:
+          type: number
+        count:
+          type: number
+        open:
+          $ref: "#/components/schemas/JSONDouble"
+        high:
+          $ref: "#/components/schemas/JSONDouble"
+        low:
+          $ref: "#/components/schemas/JSONDouble"
+        close:
+          $ref: "#/components/schemas/JSONDouble"
+        volume:
+          $ref: "#/components/schemas/JSONDouble"
+        VWAP:
+          $ref: "#/components/schemas/JSONDouble"
+        bidVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        askVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        impVolatility:
+          $ref: "#/components/schemas/JSONDouble"
+        openInterest:
+          $ref: "#/components/schemas/JSONDouble"
+
+    TheoPriceEvent:
+      description: |
+        Theo price is a snapshot of the theoretical option price computation that is periodically performed by `dxPrice` model-free computation.
+        It represents the most recent information that is available about the corresponding values at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: TheoPrice
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        sequence:
+          type: number
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        underlyingPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        delta:
+          $ref: "#/components/schemas/JSONDouble"
+        gamma:
+          $ref: "#/components/schemas/JSONDouble"
+        dividend:
+          $ref: "#/components/schemas/JSONDouble"
+        interest:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    UnderlyingEvent:
+      description: |
+        Underlying event is a snapshot of computed values that are available for an option underlying
+        symbol based on the option prices on the market.
+        It represents the most recent information that is available about the corresponding values on
+        the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Underlying
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        sequence:
+          type: number
+        volatility:
+          $ref: "#/components/schemas/JSONDouble"
+        frontVolatility:
+          $ref: "#/components/schemas/JSONDouble"
+        backVolatility:
+          $ref: "#/components/schemas/JSONDouble"
+        callVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        putVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        putCallRatio:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    ConfigurationEvent:
+      type: object
+      properties:
+        eventType:
+          const: Configuration
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+        version:
+          type: number
+        attachment:
+          type: object
+
+    OptionSaleEvent:
+      description: |
+        Option Sale event represents a trade or another market event with the price
+        (for example, market open/close price, etc.) for each option symbol listed under the specified Underlying.
+        Option Sales are intended to provide information about option trades in a continuous time slice with
+        the additional metrics, like Option Volatility, Option Delta, and Underlying Price.
+      type: object
+      properties:
+        eventType:
+          const: OptionSale
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        exchangeCode:
+          type: string
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        bidPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        askPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        exchangeSaleConditions:
+          type: string
+        tradeThroughExempt:
+          type: string
+        aggressorSide:
+          type: string
+        spreadLeg:
+          type: boolean
+        extendedTradingHours:
+          type: boolean
+        validTick:
+          type: boolean
+        type:
+          type: string
+        underlyingPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        volatility:
+          $ref: "#/components/schemas/JSONDouble"
+        delta:
+          $ref: "#/components/schemas/JSONDouble"
+        optionSymbol:
+          type: string
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    SeriesEvent:
+      description: |
+        Series event is a snapshot of computed values that are available for all option series for
+        a given underlying symbol based on the option prices on the market.
+        It represents the most recent information that is available about the corresponding values on
+        the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Series
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        sequence:
+          type: number
+        expiration:
+          type: number
+        volatility:
+          $ref: "#/components/schemas/JSONDouble"
+        callVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        putVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        putCallRatio:
+          $ref: "#/components/schemas/JSONDouble"
+        forwardPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        dividend:
+          $ref: "#/components/schemas/JSONDouble"
+        interest:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    TimeAndSaleEvent:
+      description: |
+        Time and Sale represents a trade or other market event with price, like market open/close price, etc.
+        Time and Sales are intended to provide information about trades in a continuous time slice
+        (unlike `Trade` events which are supposed to provide snapshot about the current last trade).
+      type: object
+      properties:
+        eventType:
+          const: TimeAndSale
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        exchangeCode:
+          type: string
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        bidPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        askPrice:
+          $ref: "#/components/schemas/JSONDouble"
+        exchangeSaleConditions:
+          type: string
+        tradeThroughExempt:
+          type: string
+        aggressorSide:
+          type: string
+        spreadLeg:
+          type: boolean
+        extendedTradingHours:
+          type: boolean
+        validTick:
+          type: boolean
+        type:
+          type: string
+        buyer:
+          type: string
+        seller:
+          type: string
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    TradeEvent:
+      description: |
+        Trade event is a snapshot of the price and size of the last trade during regular trading hours
+        and an overall day volume and day turnover.
+      type: object
+      properties:
+        eventType:
+          const: Trade
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        exchangeCode:
+          type: string
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        change:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        dayId:
+          type: number
+        dayVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        dayTurnover:
+          $ref: "#/components/schemas/JSONDouble"
+        tickDirection:
+          type: string
+        extendedTradingHours:
+          type: boolean
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    TradeETHEvent:
+      description: |
+        TradeETH event is a snapshot of the price and size of the last trade during
+        extended trading hours and the extended trading hours day volume and day turnover.
+        This event is defined only for symbols (typically stocks and ETFs) with a designated
+        extended trading hours (ETH, pre market and post market trading sessions).
+      type: object
+      properties:
+        eventType:
+          const: TradeETH
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        exchangeCode:
+          type: string
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        change:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        dayId:
+          type: number
+        dayVolume:
+          $ref: "#/components/schemas/JSONDouble"
+        dayTurnover:
+          $ref: "#/components/schemas/JSONDouble"
+        tickDirection:
+          type: string
+        extendedTradingHours:
+          type: boolean
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    OrderEvent:
+      description: |
+        Order event is a snapshot for a full available market depth for a symbol.
+        The collection of order events of a symbol represents the most recent information
+        that is available about orders on the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: Order
+        marketMaker:
+          type: string
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        source:
+          type: string
+        action:
+          type: string
+        actionTime:
+          type: number
+        orderId:
+          type: number
+        auxOrderId:
+          type: number
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        executedSize:
+          $ref: "#/components/schemas/JSONDouble"
+        count:
+          type: number
+        exchangeCode:
+          type: string
+        orderSide:
+          type: string
+        scope:
+          type: string
+        tradeId:
+          type: number
+        tradePrice:
+          $ref: "#/components/schemas/JSONDouble"
+        tradeSize:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    SpreadOrderEvent:
+      description: |
+        Spread order event is a snapshot for a full available market depth for all spreads
+        on a given underlying symbol. The collection of spread order events of a symbol
+        represents the most recent information that is available about spread orders on
+        the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: SpreadOrder
+        spreadSymbol:
+          type: string
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        source:
+          type: string
+        action:
+          type: string
+        actionTime:
+          type: number
+        orderId:
+          type: number
+        auxOrderId:
+          type: number
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        executedSize:
+          $ref: "#/components/schemas/JSONDouble"
+        count:
+          type: number
+        exchangeCode:
+          type: string
+        orderSide:
+          type: string
+        scope:
+          type: string
+        tradeId:
+          type: number
+        tradePrice:
+          $ref: "#/components/schemas/JSONDouble"
+        tradeSize:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number
+
+    AnalyticOrderEvent:
+      description: |
+        Represents an extension of Order introducing analytic information, e.g. adding to this order iceberg related
+        information (icebergPeakSize, icebergHiddenSize, icebergExecutedSize).
+        The collection of analytic order events of a symbol represents the most recent analytic information
+        that is available about orders on the market at any given moment of time.
+      type: object
+      properties:
+        eventType:
+          const: AnalyticOrder
+        icebergPeakSize:
+          $ref: "#/components/schemas/JSONDouble"
+        icebergHiddenSize:
+          $ref: "#/components/schemas/JSONDouble"
+        icebergExecutedSize:
+          $ref: "#/components/schemas/JSONDouble"
+        icebergType:
+          type: string
+        marketMaker:
+          type: string
+        eventFlags:
+          type: number
+        index:
+          type: number
+        time:
+          type: number
+        timeNanoPart:
+          type: number
+        sequence:
+          type: number
+        source:
+          type: string
+        action:
+          type: string
+        actionTime:
+          type: number
+        orderId:
+          type: number
+        auxOrderId:
+          type: number
+        price:
+          $ref: "#/components/schemas/JSONDouble"
+        size:
+          $ref: "#/components/schemas/JSONDouble"
+        executedSize:
+          $ref: "#/components/schemas/JSONDouble"
+        count:
+          type: number
+        exchangeCode:
+          type: string
+        orderSide:
+          type: string
+        scope:
+          type: string
+        tradeId:
+          type: number
+        tradePrice:
+          $ref: "#/components/schemas/JSONDouble"
+        tradeSize:
+          $ref: "#/components/schemas/JSONDouble"
+        eventSymbol:
+          type: string
+        eventTime:
+          type: number

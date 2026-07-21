@@ -1,0 +1,143 @@
+aid: dxfeed
+name: dxFeed
+review:
+  question: Does dxFeed expose a public, documented API surface, and is it self-serve
+    or sales-gated?
+  answer: true
+  date: '2026-07-21'
+  reviewer: API Evangelist
+  posture: documented-but-sales-gated
+findings:
+  summary: |
+    dxFeed (a Devexperts subsidiary, Munich HQ) is an institutional market
+    data vendor with a genuinely public developer surface but a sales-gated
+    production model. The knowledge base at kb.dxfeed.com openly documents a
+    REST web service (snapshot /events plus Server-Sent Events /eventSource
+    streaming), the dxLink WebSocket protocol, FIX access, a binary QD
+    protocol over TCP, an IPF reference-data web service, Morningstar-backed
+    fundamentals, and historical/tick data extraction. Two live demo
+    endpoints serve delayed data with no credentials: the REST webservice at
+    demo.dxfeed.com/webservice/rest and the dxLink WebSocket at
+    wss://demo.dxfeed.com/dxlink-ws (with a browser debug console). There is
+    no self-serve API key signup: kb.dxfeed.com says new users must contact
+    the dxFeed sales team for trial access, after which onboarding delivers
+    endpoint URLs, IP addresses, login, and password. Entitlement-gated
+    production hosts on tools.dxfeed.com (IPF, Fundamentals, Swagger UI)
+    return HTTP 401 without credentials. Authentication is login/password
+    (HTTP basic-style) credentials plus per-service entitlements rather than
+    OAuth; dxLink defines its own AUTH message flow with tokens. One real
+    machine-readable spec is public: the dxLink protocol is specified as an
+    AsyncAPI 2.4 document in the dxFeed/dxLink GitHub repo, harvested
+    verbatim into this repository. The Fundamentals Swagger spec exists but
+    is credential-gated, so it was not harvested. get.dxfeed.com operates as
+    an online store for retail data purchases; no public API pricing page
+    exists. dxfeed.com serves HTTP 403 to plain curl (bot protection) but
+    renders normally in a browser.
+  authModel: Login/password credentials with per-service entitlements issued at
+    onboarding; dxLink protocol carries its own AUTH/token message flow. No
+    public OAuth or self-serve API keys.
+  transports:
+    - protocol: REST
+      scheme: https
+      baseURL: https://demo.dxfeed.com/webservice/rest
+      documented: true
+      note: Demo endpoint public with delayed data (HTTP 200); production hosts credentialed.
+    - protocol: SSE
+      scheme: https
+      documented: true
+      note: /eventSource resource streams Server-Sent Events from the REST web service.
+    - protocol: WebSocket
+      scheme: wss
+      baseURL: wss://demo.dxfeed.com/dxlink-ws
+      documented: true
+      note: dxLink protocol; public AsyncAPI 2.4 spec and public debug console (HTTP 200).
+    - protocol: FIX
+      documented: true
+      note: Documented in the knowledge base; session hosts provisioned at onboarding only.
+    - protocol: QD (binary over TCP)
+      documented: true
+      note: Proprietary high-performance protocol referenced in kb getting-started; no public endpoint.
+    - protocol: FlatFiles
+      documented: true
+      note: Historical/tick data delivered as extracted files per kb historical-services docs.
+  probes:
+    - url: https://dxfeed.com/
+      status: 403
+      note: Cloudflare-style bot block to curl; page renders normally via browser fetch.
+    - url: https://kb.dxfeed.com/en/getting-started.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/websocket.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/fix.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/data-model/reference-data/ipf-webservice.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/data/fundamentals.html
+      status: 200
+    - url: https://kb.dxfeed.com/en/data-services/historical-services.html
+      status: 200
+    - url: https://demo.dxfeed.com/webservice/rest/help
+      status: 200
+    - url: https://demo.dxfeed.com/market-data/dxlink-ws/debug/
+      status: 200
+    - url: https://tools.dxfeed.com/webservice/rest-demo.jsp
+      status: 200
+    - url: https://tools.dxfeed.com/ipf
+      status: 401
+    - url: https://tools.dxfeed.com/fs/swagger-ui.html
+      status: 401
+    - url: https://tools.dxfeed.com/fs/v2/api-docs
+      status: 401
+    - url: https://tools.dxfeed.com/morningstar
+      status: 302
+    - url: https://get.dxfeed.com/
+      status: 200
+    - url: https://github.com/dxFeed
+      status: 200
+    - url: https://docs.dxfeed.com/dxfeed/api/index.html
+      status: 200
+    - url: https://status.dxfeed.com/
+      status: 0
+      note: Does not resolve; no public status page found.
+specProvenance:
+  - path: openapi/dxfeed-dxlink-asyncapi.yml
+    type: AsyncAPI
+    version: 2.4.0
+    title: dxLink WebSocket
+    specVersion: 1.0.2
+    source: https://raw.githubusercontent.com/dxFeed/dxLink/main/dxlink-specification/asyncapi.yml
+    harvested: '2026-07-21'
+    note: Harvested verbatim from the dxFeed/dxLink GitHub repository (default
+      branch main); declares demo server wss://demo.dxfeed.com/dxlink-ws. No
+      public OpenAPI spec exists for the REST web service; the Fundamentals
+      Swagger spec is credential-gated (401) and was NOT harvested.
+sources:
+  - url: https://kb.dxfeed.com/en/getting-started.html
+    type: Documentation
+    note: Lists access solutions (dxLink WebSocket, QD protocol, multiplatform APIs, JavaScript, FIX/REST) and states trial access requires contacting sales.
+  - url: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+    type: Documentation
+    note: Canonical REST web service docs; older kb URLs (/en/data-access/rest-api.html) now 302 to page-not-found.
+  - url: https://demo.dxfeed.com/webservice/rest/help
+    type: APIReference
+    note: Live help resource enumerating /events, /eventSource (SSE), /addSubscription, /removeSubscription and 20+ event types in JSON/XML.
+  - url: https://github.com/dxFeed/dxLink
+    type: GitHubRepository
+    note: dxLink protocol repo containing dxlink-specification/asyncapi.yml (AsyncAPI 2.4).
+  - url: https://dxfeed.com/about/
+    type: Website
+    note: Confirms Devexperts subsidiary, Munich HQ, 3.5M instruments, ~200k simultaneous streaming clients.
+  - url: https://dxfeed.com/api/javascript-and-rest-apis/
+    type: Website
+    note: Describes market data web service, news web service, and Fundamentals API via Swagger at tools.dxfeed.com/fs/swagger-ui.html (gated).
+actions:
+  asyncapiPath: openapi/dxfeed-dxlink-asyncapi.yml
+  apisYmlUpdated: true
+  reason: |
+    Six documented API products were cataloged (REST web service, dxLink
+    WebSocket, IPF reference data, Fundamentals, FIX, Historical services).
+    The only public machine-readable spec (dxLink AsyncAPI 2.4) was
+    harvested verbatim; everything else is honestly recorded as
+    credential-gated with probed HTTP statuses.
