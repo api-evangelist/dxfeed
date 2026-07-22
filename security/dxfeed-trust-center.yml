@@ -1,0 +1,12 @@
+generated: '2026-07-22'
+method: searched
+probe: true
+source: https://dxfeed.com/trust-center/
+url: https://dxfeed.com/trust-center/
+certifications:
+- SOC 2
+evidence:
+- source: https://dxfeed.com/trust-center/
+  keywords:
+  - soc2
+  - trust center

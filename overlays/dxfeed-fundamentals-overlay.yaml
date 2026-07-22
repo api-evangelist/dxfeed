@@ -1,0 +1,36 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for dxFeed Fundamentals API
+  version: 1.0.0
+x-generated: '2026-07-22'
+x-method: generated
+extends: openapi/dxfeed-fundamentals-openapi.json
+actions:
+  - target: $.info
+    update:
+      version: v0.1
+      x-apievangelist:
+        provider: dxfeed
+        harvested: '2026-07-22'
+        source: https://tools.dxfeed.com/fs/v3/api-docs
+        notes: >-
+          Spec is published unauthenticated at /fs/v3/api-docs but declares no
+          securitySchemes; production calls are entitlement-gated out-of-band
+          (login/password credentials issued at sales onboarding; 403 declared
+          on every operation). Datasets are sourced from Morningstar and Borsa
+          Istanbul. Admin manual-correction operations (addManualCorrection*/
+          addManualRemove*) mutate vendor data and should not be exposed to
+          API consumers or agents.
+  - target: $.info
+    update:
+      x-apievangelist-artifacts:
+        authentication: authentication/dxfeed-authentication.yml
+        errors: errors/dxfeed-problem-types.yml
+        conventions: conventions/dxfeed-conventions.yml
+        data-model: data-model/dxfeed-data-model.yml
+        mcp-candidate: mcp/dxfeed-mcp.yml
+        skills: skills/_index.yml
+  - target: $.servers
+    update:
+      - url: https://tools.dxfeed.com/fs
+        description: Production (entitlement-gated; credentials issued during dxFeed sales onboarding)

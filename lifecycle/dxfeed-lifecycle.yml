@@ -1,0 +1,21 @@
+generated: '2026-07-22'
+method: searched
+source: kb.dxfeed.com + live probes 2026-07-22
+versioning:
+  scheme: uri-path (Fundamentals /v0.1); dxLink protocol version negotiated in SETUP (0.1); client SDKs
+    versioned per repo (GraalVM-based Graal APIs supersede the legacy C/.NET/Python APIs)
+deprecation:
+  policy_url: null
+  sunset_header: false
+  note: 'No public deprecation policy or RFC 8594 Sunset support found. Observable lifecycle signal: legacy
+    SDKs (dxfeed-c-api, dxfeed-net-api, dxfeed-python-api) are superseded by the Graal-based SDK family;
+    old kb URLs (/en/data-access/rest-api.html) redirect to page-not-found.'
+status_page: null
+status_page_note: 'No public status page: status.dxfeed.com does not resolve; none linked from dxfeed.com
+  or kb.dxfeed.com. (The GitHub org even contains a private-use Atlassian Statuspage API wrapper, but
+  no public page.)'
+sla:
+  url: null
+  note: Uptime/SLA commitments are contractual (institutional market-data agreements), not published.
+deprecated_operations: []
+deprecated_operations_note: No operations flagged deprecated:true in the Fundamentals OpenAPI.

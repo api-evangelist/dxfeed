@@ -1,0 +1,57 @@
+generated: '2026-07-22'
+method: derived
+source: openapi/dxfeed-fundamentals-openapi.json + kb.dxfeed.com REST docs + asyncapi/dxfeed-dxlink-asyncapi.yml
+authentication:
+  style: login/password credentials + entitlements (see authentication/dxfeed-authentication.yml); dxLink
+    uses an AUTH token message
+idempotency:
+  supported: false
+  note: No idempotency-key header or documented idempotency contract; read-heavy market-data surface.
+pagination:
+  style: none
+  note: No cursor/offset pagination. The Fundamentals API bounds result sets with required date-range
+    filters (fromYmd/toYmd) plus symbol/classification filters; the REST webservice returns snapshots
+    per requested symbols/events.
+filtering:
+  params:
+  - fromYmd
+  - toYmd
+  - symbols
+  - sids
+  - cids
+  - currencyCode
+  - countryCode
+  - sicCodes
+  - industryCodes
+  - mics
+  - sources
+  note: Uniform filter parameter set across all Fundamentals dataset controllers.
+resource_pattern:
+  note: 'Every Fundamentals dataset exposes the same resource family: /recent/symbol/{symbol}, /symbol/{symbol},
+    /filter (GET and POST), /recent/snapshot, /ymd/{ymd}, plus admin POST/DELETE manual-correction operations.'
+content_negotiation:
+  request_headers:
+  - Accept-Encoding (declared required on every Fundamentals operation)
+  formats:
+    fundamentals: JSON
+    rest_webservice: JSON or XML (.json/.xml suffix or Accept header)
+    ipf: Instrument Profile Format (IPF) text
+streaming:
+  sse: /eventSource resource on the REST webservice streams Server-Sent Events
+  websocket: dxLink protocol with multiplexed virtual channels (SETUP/AUTH/CHANNEL_REQUEST/FEED_SUBSCRIPTION
+    messages)
+versioning:
+  style: uri-path
+  current: v0.1 (Fundamentals); dxLink protocol version 0.1 negotiated in SETUP
+error_envelope:
+  shape: ApiError {httpStatus, timestamp, messages[], exMessage}
+  see: errors/dxfeed-problem-types.yml
+rate_limits:
+  documented: false
+  note: No public rate-limit headers or policy documented; capacity is entitlement-managed per contract.
+request_tracing:
+  documented: false
+cross_links:
+- errors/dxfeed-problem-types.yml
+- authentication/dxfeed-authentication.yml
+- lifecycle/dxfeed-lifecycle.yml

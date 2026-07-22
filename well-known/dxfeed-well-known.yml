@@ -1,0 +1,47 @@
+generated: '2026-07-22'
+method: searched
+note: >-
+  No genuine /.well-known/ documents found on any dxFeed host (probed
+  2026-07-22). dxfeed.com serves 403 (bot protection) to all paths;
+  kb.dxfeed.com 302-redirects everything to its page-not-found page;
+  demo.dxfeed.com and tools.dxfeed.com 301 into a Cloudflare challenge;
+  get.dxfeed.com is a single-page app that returns its HTML shell (200)
+  for every path, including /.well-known/*, so those 200s are catch-alls,
+  not real documents. No security.txt, OIDC discovery, OAuth metadata,
+  api-catalog, or ai-plugin.json is published.
+hosts:
+  - host: https://dxfeed.com
+    documents:
+      - {path: /.well-known/security.txt, status: 403}
+      - {path: /.well-known/openid-configuration, status: 403}
+      - {path: /.well-known/oauth-authorization-server, status: 403}
+      - {path: /.well-known/api-catalog, status: 403}
+      - {path: /.well-known/ai-plugin.json, status: 403}
+  - host: https://kb.dxfeed.com
+    documents:
+      - {path: /.well-known/security.txt, status: 302, note: redirects to page-not-found}
+      - {path: /.well-known/openid-configuration, status: 302, note: redirects to page-not-found}
+      - {path: /.well-known/oauth-authorization-server, status: 302, note: redirects to page-not-found}
+      - {path: /.well-known/api-catalog, status: 302, note: redirects to page-not-found}
+      - {path: /.well-known/ai-plugin.json, status: 302, note: redirects to page-not-found}
+  - host: https://demo.dxfeed.com
+    documents:
+      - {path: /.well-known/security.txt, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/openid-configuration, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/oauth-authorization-server, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/api-catalog, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/ai-plugin.json, status: 301, note: Cloudflare challenge}
+  - host: https://tools.dxfeed.com
+    documents:
+      - {path: /.well-known/security.txt, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/openid-configuration, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/oauth-authorization-server, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/api-catalog, status: 301, note: Cloudflare challenge}
+      - {path: /.well-known/ai-plugin.json, status: 301, note: Cloudflare challenge}
+  - host: https://get.dxfeed.com
+    documents:
+      - {path: /.well-known/security.txt, status: 200, note: SPA catch-all HTML shell, not a real security.txt}
+      - {path: /.well-known/openid-configuration, status: 200, note: SPA catch-all HTML shell, not a real OIDC document}
+      - {path: /.well-known/oauth-authorization-server, status: 200, note: SPA catch-all HTML shell}
+      - {path: /.well-known/api-catalog, status: 200, note: SPA catch-all HTML shell}
+      - {path: /.well-known/ai-plugin.json, status: 200, note: SPA catch-all HTML shell}

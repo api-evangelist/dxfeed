@@ -1,0 +1,192 @@
+generated: '2026-07-22'
+method: derived
+status: candidate
+source: openapi/dxfeed-fundamentals-openapi.json
+note: 'No official dxFeed MCP server exists (official MCP registry and npm searched 2026-07-22). Candidate
+  tool list derived from the dxFeed Fundamentals OpenAPI (tools.dxfeed.com/fs/v3/api-docs): one read tool
+  and one filter tool per fundamentals dataset, bound to real operationIds. Admin manual-correction operations
+  (POST/DELETE) are intentionally excluded from the candidate tool surface. Production access requires
+  dxFeed-issued credentials.'
+server:
+  name: dxfeed-fundamentals
+  transport: http
+tools:
+- name: get_alpha_beta
+  description: Get the most recent alpha beta record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_27
+- name: filter_alpha_beta
+  description: Query alpha beta records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_27
+- name: get_asset_classification
+  description: Get the most recent asset classification record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_26
+- name: filter_asset_classification
+  description: Query asset classification records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_26
+- name: get_balance_statement
+  description: Get the most recent balance statement record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_25
+- name: filter_balance_statement
+  description: Query balance statement records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_25
+- name: get_cash_flow_statement
+  description: Get the most recent cash flow statement record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_24
+- name: filter_cash_flow_statement
+  description: Query cash flow statement records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_24
+- name: get_company_profile
+  description: Get the most recent company profile record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_23
+- name: filter_company_profile
+  description: Query company profile records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_23
+- name: get_consensus_estimate
+  description: Get the most recent consensus estimate record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_22
+- name: filter_consensus_estimate
+  description: Query consensus estimate records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_22
+- name: get_corporate_action
+  description: Get the most recent corporate action record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_21
+- name: filter_corporate_action
+  description: Query corporate action records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_21
+- name: get_corporate_calendar
+  description: Get the most recent corporate calendar record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_20
+- name: filter_corporate_calendar
+  description: Query corporate calendar records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_20
+- name: get_crypto_reference
+  description: Get the most recent crypto reference record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_19
+- name: filter_crypto_reference
+  description: Query crypto reference records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_19
+- name: get_crypto_summary
+  description: Get the most recent crypto summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_18
+- name: filter_crypto_summary
+  description: Query crypto summary records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_18
+- name: get_earning
+  description: Get the most recent earning record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_15
+- name: filter_earning
+  description: Query earning records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_15
+- name: get_earning_ratio
+  description: Get the most recent earning ratio record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_17
+- name: filter_earning_ratio
+  description: Query earning ratio records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_17
+- name: get_earning_report
+  description: Get the most recent earning report record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_16
+- name: filter_earning_report
+  description: Query earning report records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_16
+- name: get_economic_calendar
+  description: Get the most recent economic calendar record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_14
+- name: filter_economic_calendar
+  description: Query economic calendar records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_14
+- name: get_historical_return
+  description: Get the most recent historical return record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_13
+- name: filter_historical_return
+  description: Query historical return records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_13
+- name: filter_history
+  description: Query history records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getByFilter_2
+- name: get_income_statement
+  description: Get the most recent income statement record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_12
+- name: filter_income_statement
+  description: Query income statement records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_12
+- name: get_insider_ownership_summary
+  description: Get the most recent insider ownership summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_11
+- name: filter_insider_ownership_summary
+  description: Query insider ownership summary records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_11
+- name: get_institutional_ownership_summary
+  description: Get the most recent institutional ownership summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_10
+- name: filter_institutional_ownership_summary
+  description: Query institutional ownership summary records by date range, symbols, and classification
+    filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_10
+- name: get_instrument_daily_summary
+  description: Get the most recent instrument daily summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_9
+- name: filter_instrument_daily_summary
+  description: Query instrument daily summary records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_9
+- name: get_instrument_reference
+  description: Get the most recent instrument reference record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_8
+- name: filter_instrument_reference
+  description: Query instrument reference records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_8
+- name: get_ipo_calendar
+  description: Get the most recent ipo calendar record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_7
+- name: filter_ipo_calendar
+  description: Query ipo calendar records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_7
+- name: get_merger_and_acquisition
+  description: Get the most recent merger and acquisition record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_6
+- name: filter_merger_and_acquisition
+  description: Query merger and acquisition records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_6
+- name: get_mutual_fund_ownership_summary
+  description: Get the most recent mutual fund ownership summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_5
+- name: filter_mutual_fund_ownership_summary
+  description: Query mutual fund ownership summary records by date range, symbols, and classification
+    filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_5
+- name: get_operation_ratio
+  description: Get the most recent operation ratio record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_4
+- name: filter_operation_ratio
+  description: Query operation ratio records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_4
+- name: get_price
+  description: Get the most recent price record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_3
+- name: filter_price
+  description: Query price records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_3
+- name: get_reference_change
+  description: Get the most recent reference change record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_2
+- name: filter_reference_change
+  description: Query reference change records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_2
+- name: get_shares_ownership_summary
+  description: Get the most recent shares ownership summary record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol_1
+- name: filter_shares_ownership_summary
+  description: Query shares ownership summary records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter_1
+- name: filter_snapshot
+  description: Query snapshot records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getByFilter_1
+- name: filter_symbol_state_change
+  description: Query symbol state change records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getByFilter
+- name: get_valuation_ratio
+  description: Get the most recent valuation ratio record(s) for a symbol
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getRecentSymbol
+- name: filter_valuation_ratio
+  description: Query valuation ratio records by date range, symbols, and classification filters
+  source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter

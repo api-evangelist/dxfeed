@@ -1,0 +1,96 @@
+generated: '2026-07-22'
+method: searched
+source: npm registry, PyPI, NuGet, pkg.go.dev, github.com/dxFeed
+packages:
+  - language: javascript
+    registry: npm
+    name: "@dxfeed/api"
+    url: https://www.npmjs.com/package/@dxfeed/api
+    install: npm install @dxfeed/api
+    official: true
+    note: dxFeed streaming data client (dxfeed-js-api repo).
+  - language: javascript
+    registry: npm
+    name: "@dxfeed/dxlink-api"
+    url: https://www.npmjs.com/package/@dxfeed/dxlink-api
+    install: npm install @dxfeed/dxlink-api
+    official: true
+    note: dxLink WebSocket protocol client (umbrella package).
+  - language: javascript
+    registry: npm
+    name: "@dxfeed/dxlink-websocket-client"
+    url: https://www.npmjs.com/package/@dxfeed/dxlink-websocket-client
+    install: npm install @dxfeed/dxlink-websocket-client
+    official: true
+    note: Low-level dxLink WebSocket client.
+  - language: javascript
+    registry: npm
+    name: "@dxfeed/dxlink-feed"
+    url: https://www.npmjs.com/package/@dxfeed/dxlink-feed
+    install: npm install @dxfeed/dxlink-feed
+    official: true
+    note: dxLink FEED service channel (real-time and historical market data).
+  - language: javascript
+    registry: npm
+    name: "@dxfeed/dxlink-dom"
+    url: https://www.npmjs.com/package/@dxfeed/dxlink-dom
+    install: npm install @dxfeed/dxlink-dom
+    official: true
+    note: dxLink DOM service channel (depth of market / order book).
+  - language: python
+    registry: pypi
+    name: dxfeed
+    url: https://pypi.org/project/dxfeed/
+    install: pip install dxfeed
+    official: true
+    note: dxFeed Python API built on the C API (dxfeed-python-api repo).
+  - language: csharp
+    registry: nuget
+    name: DxFeed.Graal.Net
+    url: https://www.nuget.org/packages/DxFeed.Graal.Net
+    install: dotnet add package DxFeed.Graal.Net
+    official: true
+    note: .NET client built on the GraalVM-compiled dxFeed Java SDK.
+  - language: csharp
+    registry: nuget
+    name: DxFeed.Graal.Native
+    url: https://www.nuget.org/packages/DxFeed.Graal.Native
+    official: true
+    note: Native GraalVM wrapper the .NET client depends on.
+  - language: go
+    registry: pkg.go.dev
+    name: github.com/dxfeed/dxfeed-graal-go-api
+    url: https://pkg.go.dev/github.com/dxfeed/dxfeed-graal-go-api
+    install: go get github.com/dxfeed/dxfeed-graal-go-api
+    official: true
+    note: Go client built on the GraalVM-compiled dxFeed Java SDK.
+  - language: swift
+    registry: swiftpm
+    name: dxfeed-graal-swift-api
+    url: https://github.com/dxFeed/dxfeed-graal-swift-api
+    install: Swift Package Manager (add https://github.com/dxFeed/dxfeed-graal-swift-api)
+    official: true
+    note: Swift client built on the GraalVM-compiled dxFeed Java SDK.
+  - language: cpp
+    registry: github-releases
+    name: dxfeed-graal-cxx-api
+    url: https://github.com/dxFeed/dxfeed-graal-cxx-api
+    official: true
+    note: C/C++ client built on the GraalVM-compiled dxFeed Java SDK; binaries on GitHub releases.
+  - language: c
+    registry: github-releases
+    name: dxfeed-c-api
+    url: https://github.com/dxFeed/dxfeed-c-api
+    official: true
+    note: Legacy dxFeed C API.
+  - language: java
+    registry: vendor
+    name: dxFeed Java API (QDS)
+    url: https://docs.dxfeed.com/dxfeed/api/index.html
+    official: true
+    note: Canonical Java API; distributed from dxFeed's own site (Javadoc at docs.dxfeed.com), not Maven Central.
+notes: >-
+  No dxFeed artifacts on Maven Central (groups com.dxfeed / com.devexperts.qd
+  return zero results 2026-07-22); the Java API is vendor-distributed.
+  npm publisher dvpetrov publishes the @dxfeed scope; all @dxfeed packages map
+  to repos in github.com/dxFeed.

@@ -1,0 +1,46 @@
+generated: '2026-07-22'
+method: derived
+source: openapi/dxfeed-fundamentals-openapi.json
+format: custom
+envelope:
+  schema: ApiError
+  fields:
+    httpStatus: string enum of HTTP status phrases (e.g. "403 FORBIDDEN")
+    timestamp: string
+    messages: array of human-readable error strings
+    exMessage: exception message string
+  content_type: '*/* (not application/problem+json; dxFeed does not use RFC 9457)'
+problems:
+- status: 400
+  title: Bad Request
+  detail: Malformed or invalid request parameters (e.g. bad ymd date, unknown filter values).
+  schema: ApiError
+  occurs_on: every operation (declared uniformly across all 269 operations)
+- status: 403
+  title: Forbidden
+  detail: Missing or insufficient entitlements for the requested dataset; production access is provisioned
+    by dxFeed sales onboarding.
+  schema: ApiError
+  occurs_on: every operation (declared uniformly across all 269 operations)
+- status: 406
+  title: Not Acceptable
+  detail: Content negotiation failure; the service could not produce a response matching the Accept/Accept-Encoding
+    headers (Accept-Encoding is a required header on every operation).
+  schema: ApiError
+  occurs_on: every operation (declared uniformly across all 269 operations)
+- status: 500
+  title: Internal Server Error
+  detail: Internal server error.
+  schema: ApiError
+  occurs_on: every operation (declared uniformly across all 269 operations)
+- status: 503
+  title: Service Unavailable
+  detail: Service temporarily unavailable.
+  schema: ApiError
+  occurs_on: every operation (declared uniformly across all 269 operations)
+- status: 401
+  title: Unauthorized
+  detail: 'Observed live (not declared in the spec): credential-gated hosts such as tools.dxfeed.com/ipf
+    and the Fundamentals production endpoints return HTTP 401 without customer login/password.'
+  schema: null
+  occurs_on: live probes of entitlement-gated hosts

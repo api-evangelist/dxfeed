@@ -1,0 +1,37 @@
+generated: '2026-07-22'
+method: derived
+source: openapi/dxfeed-fundamentals-openapi.json + asyncapi/dxfeed-dxlink-asyncapi.yml + kb.dxfeed.com
+  + dxfeed.com/trust-center/
+standards:
+- id: fix
+  conforms: true
+  evidence: Industry-standard FIX protocol access to market data documented at kb.dxfeed.com/en/market-data-api/data-access-solutions/fix.html
+- id: asyncapi-2.4
+  conforms: true
+  evidence: dxLink WebSocket protocol published as an AsyncAPI 2.4 document (asyncapi/dxfeed-dxlink-asyncapi.yml,
+    harvested from dxFeed/dxLink)
+- id: openapi-3.1
+  conforms: true
+  evidence: Fundamentals API publishes OpenAPI 3.1.0 at tools.dxfeed.com/fs/v3/api-docs
+- id: server-sent-events
+  conforms: true
+  evidence: REST webservice /eventSource resource streams SSE
+- id: websocket-rfc6455
+  conforms: true
+  evidence: dxLink runs over standard WebSocket
+- id: soc2
+  conforms: true
+  evidence: SOC 2 attested on https://dxfeed.com/trust-center/
+- id: oauth2
+  conforms: false
+  evidence: No OAuth surface; login/password credentials + entitlements
+- id: oidc
+  conforms: false
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: Errors use a custom ApiError envelope, not application/problem+json
+- id: json-api
+  conforms: false
+- id: idempotency-key
+  conforms: false
+  evidence: No idempotency-key contract documented

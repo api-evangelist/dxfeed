@@ -90,6 +90,9 @@ findings:
       status: 401
     - url: https://tools.dxfeed.com/fs/v2/api-docs
       status: 401
+    - url: https://tools.dxfeed.com/fs/v3/api-docs
+      status: 200
+      note: Full Fundamentals OpenAPI 3.1.0 served unauthenticated (found 2026-07-22 enrichment round).
     - url: https://tools.dxfeed.com/morningstar
       status: 302
     - url: https://get.dxfeed.com/
@@ -102,7 +105,20 @@ findings:
       status: 0
       note: Does not resolve; no public status page found.
 specProvenance:
-  - path: openapi/dxfeed-dxlink-asyncapi.yml
+  - path: openapi/dxfeed-fundamentals-openapi.json
+    type: OpenAPI
+    version: 3.1.0
+    title: dxFeed Fundamentals API
+    source: https://tools.dxfeed.com/fs/v3/api-docs
+    harvested: '2026-07-22'
+    note: >-
+      Harvested verbatim 2026-07-22. The 2026-07-21 round concluded the
+      Fundamentals spec was credential-gated after probing /fs/v2/api-docs
+      (401) and /fs/swagger-ui.html (401) — but /fs/v3/api-docs serves the
+      full OpenAPI 3.1.0 (176 paths, 269 operations, 45 schemas)
+      unauthenticated. No securitySchemes declared; entitlements enforced
+      out-of-band.
+  - path: asyncapi/dxfeed-dxlink-asyncapi.yml
     type: AsyncAPI
     version: 2.4.0
     title: dxLink WebSocket
@@ -133,7 +149,7 @@ sources:
     type: Website
     note: Describes market data web service, news web service, and Fundamentals API via Swagger at tools.dxfeed.com/fs/swagger-ui.html (gated).
 actions:
-  asyncapiPath: openapi/dxfeed-dxlink-asyncapi.yml
+  asyncapiPath: asyncapi/dxfeed-dxlink-asyncapi.yml
   apisYmlUpdated: true
   reason: |
     Six documented API products were cataloged (REST web service, dxLink

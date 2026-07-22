@@ -1,0 +1,280 @@
+generated: '2026-07-22'
+method: derived
+source: openapi/dxfeed-fundamentals-openapi.json
+note: 'Derived from the dxFeed Fundamentals OpenAPI. The model is a star: 28 flat per-dataset record entities
+  all keyed to the instrument/company identity carried in FundamentalIdentityObject-style fields (symbol,
+  sid = security id, cid = company id). There are no cross-entity $ref links in the spec; joins happen
+  on the shared identity fields. The broader dxFeed catalog identity spine is the Instrument Profile Format
+  (IPF) served by the IPF web service.'
+identity:
+  object: FundamentalIdentityObject
+  fields:
+  - symbol
+  - sid
+  - cid
+  note: sid is the Morningstar security id, cid the company id; symbol is the dxFeed ticker symbol.
+entities:
+- entity: AlphaBeta
+  dataset: alpha-beta
+  fields: 12
+  identity_fields:
+  - sid
+- entity: AssetClassification
+  dataset: asset-classification
+  fields: 17
+  identity_fields:
+  - sid
+  - cid
+- entity: BalanceStatement
+  dataset: balance-statement
+  fields: 28
+  identity_fields:
+  - sid
+  - cid
+- entity: CashFlowStatement
+  dataset: cash-flow-statement
+  fields: 20
+  identity_fields:
+  - sid
+  - cid
+- entity: CompanyProfile
+  dataset: company-profile
+  fields: 15
+  identity_fields:
+  - sid
+  - cid
+- entity: ConsensusEstimate
+  dataset: consensus-estimate
+  fields: 16
+  identity_fields:
+  - sid
+- entity: CorporateAction
+  dataset: corporate-action
+  fields: 13
+  identity_fields:
+  - sid
+- entity: CorporateCalendar
+  dataset: corporate-calendar
+  fields: 17
+  identity_fields:
+  - sid
+  - cid
+- entity: CryptoReference
+  dataset: crypto-reference
+  fields: 13
+  identity_fields:
+  - sid
+- entity: CryptoSummary
+  dataset: crypto-summary
+  fields: 22
+  identity_fields:
+  - sid
+- entity: Earning
+  dataset: earning
+  fields: 23
+  identity_fields:
+  - sid
+  - cid
+- entity: EarningRatio
+  dataset: earning-ratio
+  fields: 13
+  identity_fields:
+  - sid
+- entity: EarningReport
+  dataset: earning-report
+  fields: 22
+  identity_fields:
+  - sid
+- entity: EconomicCalendar
+  dataset: economic-calendar
+  fields: 23
+  identity_fields:
+  - sid
+- entity: HistoricalReturn
+  dataset: historical-return
+  fields: 11
+  identity_fields:
+  - sid
+- entity: IncomeStatement
+  dataset: income-statement
+  fields: 20
+  identity_fields:
+  - sid
+  - cid
+- entity: InsiderOwnershipSummary
+  dataset: insider-ownership-summary
+  fields: 15
+  identity_fields:
+  - sid
+- entity: InstitutionalOwnershipSummary
+  dataset: institutional-ownership-summary
+  fields: 14
+  identity_fields:
+  - sid
+- entity: InstrumentDailySummary
+  dataset: instrument-daily-summary
+  fields: 11
+  identity_fields:
+  - sid
+- entity: InstrumentReference
+  dataset: instrument-reference
+  fields: 19
+  identity_fields:
+  - sid
+  - cid
+  - cusip
+- entity: IpoCalendar
+  dataset: ipo-calendar
+  fields: 12
+  identity_fields:
+  - sid
+  - cid
+- entity: MergerAndAcquisition
+  dataset: merger-and-acquisition
+  fields: 17
+  identity_fields:
+  - sid
+- entity: MutualFundOwnershipSummary
+  dataset: mutual-fund-ownership-summary
+  fields: 14
+  identity_fields:
+  - sid
+- entity: OperationRatio
+  dataset: operation-ratio
+  fields: 28
+  identity_fields:
+  - sid
+  - cid
+- entity: Price
+  dataset: price
+  fields: 14
+  identity_fields:
+  - sid
+- entity: ReferenceChange
+  dataset: reference-change
+  fields: 13
+  identity_fields:
+  - sid
+- entity: SharesOwnershipSummary
+  dataset: shares-ownership-summary
+  fields: 15
+  identity_fields:
+  - sid
+- entity: ValuationRatio
+  dataset: valuation-ratio
+  fields: 24
+  identity_fields:
+  - sid
+relationships:
+- from: AlphaBeta
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: AssetClassification
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: BalanceStatement
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: CashFlowStatement
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: CompanyProfile
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: ConsensusEstimate
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: CorporateAction
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: CorporateCalendar
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: CryptoReference
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: CryptoSummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: Earning
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: EarningRatio
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: EarningReport
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: EconomicCalendar
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: HistoricalReturn
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: IncomeStatement
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: InsiderOwnershipSummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: InstitutionalOwnershipSummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: InstrumentDailySummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: InstrumentReference
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid/cusip
+- from: IpoCalendar
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: MergerAndAcquisition
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: MutualFundOwnershipSummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: OperationRatio
+  to: Instrument
+  kind: belongs_to
+  via: sid/cid
+- from: Price
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: ReferenceChange
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: SharesOwnershipSummary
+  to: Instrument
+  kind: belongs_to
+  via: sid
+- from: ValuationRatio
+  to: Instrument
+  kind: belongs_to
+  via: sid

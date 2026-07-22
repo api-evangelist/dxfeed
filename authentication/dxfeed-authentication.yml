@@ -1,0 +1,35 @@
+generated: '2026-07-22'
+method: searched
+docs: https://kb.dxfeed.com/en/getting-started.html
+source: kb.dxfeed.com docs + asyncapi/dxfeed-dxlink-asyncapi.yml + live probes
+summary:
+  types:
+  - http-basic (login/password credentials)
+  - dxLink AUTH token (protocol message)
+  self_serve: false
+  note: No OAuth, no self-serve API keys. Production credentials (endpoint URLs, login, password) plus
+    per-service entitlements are issued during sales onboarding. Public demo endpoints (demo.dxfeed.com
+    REST webservice, wss://demo.dxfeed.com/dxlink-ws) require no credentials and serve delayed data.
+schemes:
+- name: credentials
+  type: http
+  scheme: basic
+  description: Login/password credentials with per-service entitlements for REST webservice, IPF web service
+    (tools.dxfeed.com/ipf returns 401 without them), Fundamentals production, and historical/tick extraction.
+  sources:
+  - https://kb.dxfeed.com/en/data-model/reference-data/ipf-webservice.html
+  - 'live probe: tools.dxfeed.com/ipf HTTP 401'
+- name: dxlink-auth
+  type: protocol-message
+  description: 'dxLink WebSocket protocol authentication: after SETUP, the server sends AUTH_STATE UNAUTHORIZED
+    and the client sends an AUTH message carrying a token; the server replies AUTH_STATE AUTHORIZED. Token
+    issuance is part of dxFeed onboarding; the demo server does not require auth.'
+  sources:
+  - asyncapi/dxfeed-dxlink-asyncapi.yml
+- name: fundamentals-openapi
+  type: none-declared
+  description: The Fundamentals OpenAPI (tools.dxfeed.com/fs/v3/api-docs) declares no securitySchemes;
+    entitlements are enforced out-of-band (403 responses declared on every operation; live production
+    endpoints are credential-gated).
+  sources:
+  - openapi/dxfeed-fundamentals-openapi.json

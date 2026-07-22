@@ -1,0 +1,11 @@
+generated: '2026-07-22'
+method: generated
+skills:
+  - file: dxfeed-company-fundamentals-lookup.md
+    name: Look up company fundamentals for a symbol
+    api: openapi/dxfeed-fundamentals-openapi.json
+    operations: [getRecentSymbol_23, getRecentSymbol, getRecentSymbol_12, getRecentSymbol_25, getRecentSymbol_24, getRecentSymbol_15]
+  - file: dxfeed-fundamentals-screening.md
+    name: Screen fundamentals across markets by date range
+    api: openapi/dxfeed-fundamentals-openapi.json
+    operations: [getDeepFilter, getDeepFilter_7, getDeepFilter_14, getDeepFilter_23]
