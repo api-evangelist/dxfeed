@@ -190,3 +190,9 @@ tools:
 - name: filter_valuation_ratio
   description: Query valuation ratio records by date range, symbols, and classification filters
   source_operation: openapi/dxfeed-fundamentals-openapi.json#getDeepFilter
+deployment:
+  mode: none
+  verified: derived
+  tools: 59
+  checked: '2026-08-12'
+  source: catalog MCP census
