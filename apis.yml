@@ -59,11 +59,11 @@ apis:
     type: APIReference
   - url: https://tools.dxfeed.com/webservice/rest-demo.jsp
     type: Sandbox
-  description: REST service over the core dxFeed API with /events (snapshot), /eventSource
-    (Server-Sent Events stream), /addSubscription, and /removeSubscription resources
-    across 20+ market event types (Quote, Trade, Profile, Candle, Greeks, Order, Series)
-    in JSON or XML. A public demo endpoint serves delayed data; production hosts and
-    credentials are issued during sales onboarding.
+  description: >-
+    REST service over the core dxFeed API with /events (snapshot), /eventSource (Server-Sent Events stream),
+    /addSubscription, and /removeSubscription resources across 20+ market event types (Quote, Trade, Profile,
+    Candle, Greeks, Order, Series) in JSON or XML. A public demo endpoint serves delayed data; production
+    hosts and credentials are issued during sales onboarding.
 - aid: dxfeed:dxfeed-dxlink-websocket-api
   name: dxFeed dxLink WebSocket API
   tags:
@@ -83,12 +83,11 @@ apis:
     type: Sandbox
   - url: https://github.com/dxFeed/dxLink
     type: GitHubRepository
-  description: dxLink is dxFeed's WebSocket protocol for real-time market data streaming
-    with multiplexed virtual channels, authorization, and FEED/DOM (order book) service
-    channels. The protocol is publicly specified as an AsyncAPI 2.4 document in the
-    dxFeed/dxLink GitHub repository, with a live demo server (wss://demo.dxfeed.com/dxlink-ws)
-    and an interactive debug console; client SDKs exist for JavaScript, Java, .NET,
-    C++, and Swift.
+  description: >-
+    dxLink is dxFeed's WebSocket protocol for real-time market data streaming with multiplexed virtual
+    channels, authorization, and FEED/DOM (order book) service channels. The protocol is publicly specified
+    as an AsyncAPI 2.4 document in the dxFeed/dxLink GitHub repository, with a live demo server (wss://demo.dxfeed.com/dxlink-ws)
+    and an interactive debug console; client SDKs exist for JavaScript, Java, .NET, C++, and Swift.
 - aid: dxfeed:dxfeed-ipf-webservice
   name: dxFeed Instrument Profile (IPF) Web Service
   tags:
@@ -101,38 +100,11 @@ apis:
   properties:
   - url: https://kb.dxfeed.com/en/data-model/reference-data/ipf-webservice.html
     type: Documentation
-  description: Reference-data web service for requesting instrument profiles in dxFeed's
-    Instrument Profile Format (IPF), including live incremental updates, covering
-    the 3.5M instruments in the dxFeed symbology universe. The documented host
-    (https://tools.dxfeed.com/ipf) requires customer credentials (HTTP 401 without
+  description: >-
+    Reference-data web service for requesting instrument profiles in dxFeed's Instrument Profile Format
+    (IPF), including live incremental updates, covering the 3.5M instruments in the dxFeed symbology universe.
+    The documented host (https://tools.dxfeed.com/ipf) requires customer credentials (HTTP 401 without
     entitlements).
-- aid: dxfeed:dxfeed-fundamentals-api
-  name: dxFeed Fundamentals API
-  tags:
-  - Fundamentals
-  - Equities
-  - Morningstar
-  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/apis-json-logo.jpg
-  humanURL: https://kb.dxfeed.com/en/data/fundamentals.html
-  baseURL: https://tools.dxfeed.com/fs
-  properties:
-  - url: https://kb.dxfeed.com/en/data/fundamentals.html
-    type: Documentation
-  - url: openapi/dxfeed-fundamentals-openapi.json
-    type: OpenAPI
-  - url: overlays/dxfeed-fundamentals-overlay.yaml
-    type: Overlay
-  - url: mcp/dxfeed-mcp.yml
-    type: MCPServer
-  - url: data-model/dxfeed-data-model.yml
-    type: DataModel
-  description: Fundamental equity data sourced from Morningstar and Borsa Istanbul
-    for ~45,000 companies - financial statements, valuations, dividends, earnings
-    ratios, insider trading, corporate calendars - 28 datasets sharing a uniform
-    /recent/symbol, /symbol, and /filter resource pattern, delivered as JSON from
-    tools.dxfeed.com/fs (plus regional Morningstar hosts). The OpenAPI 3.1.0 spec
-    (176 paths, 269 operations) is publicly served at tools.dxfeed.com/fs/v3/api-docs
-    and harvested into this repository; production calls remain entitlement-gated.
 - aid: dxfeed:dxfeed-fix-api
   name: dxFeed FIX API
   tags:
@@ -144,9 +116,9 @@ apis:
   properties:
   - url: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/fix.html
     type: Documentation
-  description: Industry-standard FIX protocol access to dxFeed market data for trading
-    systems. Session endpoints and credentials are provisioned during onboarding;
-    no public FIX gateway host is documented.
+  description: >-
+    Industry-standard FIX protocol access to dxFeed market data for trading systems. Session endpoints
+    and credentials are provisioned during onboarding; no public FIX gateway host is documented.
 - aid: dxfeed:dxfeed-historical-data-services
   name: dxFeed Historical Data Services
   tags:
@@ -158,11 +130,475 @@ apis:
   properties:
   - url: https://kb.dxfeed.com/en/data-services/historical-services.html
     type: Documentation
-  description: Historical data access covering candle/aggregated data and raw tick
-    data extraction (dxFeed stores up to 10TB of raw data per day). The knowledge
-    base documents how to request tick data and read extracted files; access hosts
-    and credentials are entitlement-managed and issued by sales.
+  description: >-
+    Historical data access covering candle/aggregated data and raw tick data extraction (dxFeed stores
+    up to 10TB of raw data per day). The knowledge base documents how to request tick data and read extracted
+    files; access hosts and credentials are entitlement-managed and issued by sales.
+- aid: dxfeed:dxfeed-alpha-beta-controller-api
+  name: dxFeed Alpha Beta Controller API
+  description: The alpha-beta-controller API from dxFeed — 6 operation(s) for alpha-beta-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - alpha-beta-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-alpha-beta-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-asset-classification-controller-api
+  name: dxFeed Asset Classification Controller API
+  description: >-
+    The asset-classification-controller API from dxFeed — 5 operation(s) for asset-classification-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - asset-classification-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-asset-classification-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-balance-statement-controller-api
+  name: dxFeed Balance Statement Controller API
+  description: >-
+    The balance-statement-controller API from dxFeed — 6 operation(s) for balance-statement-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - balance-statement-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-balance-statement-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-cash-flow-statement-controller-api
+  name: dxFeed Cash Flow Statement Controller API
+  description: >-
+    The cash-flow-statement-controller API from dxFeed — 6 operation(s) for cash-flow-statement-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - cash-flow-statement-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-cash-flow-statement-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-company-profile-controller-api
+  name: dxFeed Company Profile Controller API
+  description: >-
+    The company-profile-controller API from dxFeed — 5 operation(s) for company-profile-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - company-profile-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-company-profile-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-consensus-estimate-controller-api
+  name: dxFeed Consensus Estimate Controller API
+  description: >-
+    The consensus-estimate-controller API from dxFeed — 6 operation(s) for consensus-estimate-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - consensus-estimate-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-consensus-estimate-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-corporate-action-controller-api
+  name: dxFeed Corporate Action Controller API
+  description: >-
+    The corporate-action-controller API from dxFeed — 8 operation(s) for corporate-action-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - corporate-action-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-corporate-action-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-corporate-calendar-controller-api
+  name: dxFeed Corporate Calendar Controller API
+  description: >-
+    The corporate-calendar-controller API from dxFeed — 7 operation(s) for corporate-calendar-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - corporate-calendar-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-corporate-calendar-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-crypto-reference-controller-api
+  name: dxFeed Crypto Reference Controller API
+  description: >-
+    The crypto-reference-controller API from dxFeed — 5 operation(s) for crypto-reference-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - crypto-reference-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-crypto-reference-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-crypto-summary-controller-api
+  name: dxFeed Crypto Summary Controller API
+  description: >-
+    The crypto-summary-controller API from dxFeed — 6 operation(s) for crypto-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - crypto-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-crypto-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-earning-controller-api
+  name: dxFeed Earning Controller API
+  description: The earning-controller API from dxFeed — 6 operation(s) for earning-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - earning-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-earning-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-earning-ratio-controller-api
+  name: dxFeed Earning Ratio Controller API
+  description: >-
+    The earning-ratio-controller API from dxFeed — 6 operation(s) for earning-ratio-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - earning-ratio-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-earning-ratio-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-earning-report-controller-api
+  name: dxFeed Earning Report Controller API
+  description: >-
+    The earning-report-controller API from dxFeed — 6 operation(s) for earning-report-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - earning-report-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-earning-report-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-economic-calendar-controller-api
+  name: dxFeed Economic Calendar Controller API
+  description: >-
+    The economic-calendar-controller API from dxFeed — 7 operation(s) for economic-calendar-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - economic-calendar-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-economic-calendar-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-historical-return-controller-api
+  name: dxFeed Historical Return Controller API
+  description: >-
+    The historical-return-controller API from dxFeed — 6 operation(s) for historical-return-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - historical-return-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-historical-return-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-history-controller-api
+  name: dxFeed History Controller API
+  description: The history-controller API from dxFeed — 2 operation(s) for history-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - history-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-history-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-income-statement-controller-api
+  name: dxFeed Income Statement Controller API
+  description: >-
+    The income-statement-controller API from dxFeed — 6 operation(s) for income-statement-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - income-statement-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-income-statement-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-insider-ownership-summary-controller-api
+  name: dxFeed Insider Ownership Summary Controller API
+  description: >-
+    The insider-ownership-summary-controller API from dxFeed — 6 operation(s) for insider-ownership-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - insider-ownership-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-insider-ownership-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-institutional-ownership-summary-controller-api
+  name: dxFeed Institutional Ownership Summary Controller API
+  description: >-
+    The institutional-ownership-summary-controller API from dxFeed — 6 operation(s) for institutional-ownership-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - institutional-ownership-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-institutional-ownership-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-instrument-daily-summary-controller-api
+  name: dxFeed Instrument Daily Summary Controller API
+  description: >-
+    The instrument-daily-summary-controller API from dxFeed — 6 operation(s) for instrument-daily-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - instrument-daily-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-instrument-daily-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-instrument-reference-controller-api
+  name: dxFeed Instrument Reference Controller API
+  description: >-
+    The instrument-reference-controller API from dxFeed — 5 operation(s) for instrument-reference-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - instrument-reference-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-instrument-reference-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-ipo-calendar-controller-api
+  name: dxFeed Ipo Calendar Controller API
+  description: >-
+    The ipo-calendar-controller API from dxFeed — 6 operation(s) for ipo-calendar-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - ipo-calendar-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-ipo-calendar-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-merger-and-acquisition-controller-api
+  name: dxFeed Merger And Acquisition Controller API
+  description: >-
+    The merger-and-acquisition-controller API from dxFeed — 7 operation(s) for merger-and-acquisition-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - merger-and-acquisition-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-merger-and-acquisition-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-mutual-fund-ownership-summary-controller-api
+  name: dxFeed Mutual Fund Ownership Summary Controller API
+  description: >-
+    The mutual-fund-ownership-summary-controller API from dxFeed — 6 operation(s) for mutual-fund-ownership-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - mutual-fund-ownership-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-mutual-fund-ownership-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-operation-ratio-controller-api
+  name: dxFeed Operation Ratio Controller API
+  description: >-
+    The operation-ratio-controller API from dxFeed — 6 operation(s) for operation-ratio-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - operation-ratio-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-operation-ratio-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-price-controller-api
+  name: dxFeed Price Controller API
+  description: The price-controller API from dxFeed — 6 operation(s) for price-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - price-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-price-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-reference-change-controller-api
+  name: dxFeed Reference Change Controller API
+  description: >-
+    The reference-change-controller API from dxFeed — 7 operation(s) for reference-change-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - reference-change-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-reference-change-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-shares-ownership-summary-controller-api
+  name: dxFeed Shares Ownership Summary Controller API
+  description: >-
+    The shares-ownership-summary-controller API from dxFeed — 6 operation(s) for shares-ownership-summary-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - shares-ownership-summary-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-shares-ownership-summary-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-snapshot-controller-api
+  name: dxFeed Snapshot Controller API
+  description: The snapshot-controller API from dxFeed — 2 operation(s) for snapshot-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - snapshot-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-snapshot-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-symbol-state-change-controller-api
+  name: dxFeed Symbol State Change Controller API
+  description: >-
+    The symbol-state-change-controller API from dxFeed — 2 operation(s) for symbol-state-change-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - symbol-state-change-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-symbol-state-change-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
+- aid: dxfeed:dxfeed-valuation-ratio-controller-api
+  name: dxFeed Valuation Ratio Controller API
+  description: >-
+    The valuation-ratio-controller API from dxFeed — 6 operation(s) for valuation-ratio-controller.
+  humanURL: https://kb.dxfeed.com/en/market-data-api/data-access-solutions/rest.html
+  baseURL: https://demo.dxfeed.com/webservice/rest
+  tags:
+  - valuation-ratio-controller
+  properties:
+  - type: OpenAPI
+    url: openapi/dxfeed-valuation-ratio-controller-api-openapi.yml
+  - type: Documentation
+    url: https://kb.dxfeed.com/en/data/fundamentals.html
+  - type: DataModel
+    url: data-model/dxfeed-data-model.yml
 common:
+- type: Overlay
+  url: overlays/dxfeed-fundamentals-overlay.yaml
+- type: MCPServer
+  url: mcp/dxfeed-mcp.yml
 - type: AgenticAccess
   url: agentic-access/dxfeed-agentic-access.yml
 - type: Packages
