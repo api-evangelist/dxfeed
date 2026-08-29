@@ -13,6 +13,18 @@ description: dxFeed is a market data distributor and subsidiary of Devexperts, h
   Events streaming, the dxLink WebSocket protocol (public AsyncAPI spec and live demo
   endpoint), a binary QD protocol over TCP, FIX, file-based historical/tick data
   extraction, and Java/C++/.NET/Swift/Go/JavaScript/Python client libraries.
+deliveryModel:
+  model: unknown
+  open_source: unknown
+  commercial: true
+  callable_host: false
+  label: Delivery model not determined — needs a product licence on record
+  confidence: low
+  source:
+  - pricing
+  - repository-unlicensed
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: unknown
   onboarding: self-serve
