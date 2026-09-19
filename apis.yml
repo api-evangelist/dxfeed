@@ -45,6 +45,17 @@ tags:
 - Market Data
 - Real-Time
 - Historical Data
+- Stocks
+- Options
+- Futures
+- Crypto
+- Reference Data
+- Fundamentals
+tags_raw:
+- Financial
+- Market Data
+- Real-Time
+- Historical Data
 - Equities
 - Options
 - Futures
@@ -58,6 +69,12 @@ apis:
 - aid: dxfeed:dxfeed-rest-api
   name: dxFeed REST Web Service API
   tags:
+  - Market Data
+  - REST
+  - Server-Sent Events
+  - Quotes
+  - Trade
+  tags_raw:
   - Market Data
   - REST
   - Server-Sent Events
