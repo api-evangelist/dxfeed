@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
   title: dxFeed Fundamentals Asset Classification Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -68,6 +66,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Add manual correction 24
+      x-summary-source: derived
     delete:
       tags:
       - asset-classification-controller
@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Add manual remove 24
+      x-summary-source: derived
   /v0.1/asset-classification/recent/snapshot:
     get:
       tags:
@@ -214,6 +216,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Get recent snapshot 26
+      x-summary-source: derived
     post:
       tags:
       - asset-classification-controller
@@ -269,6 +273,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Post recent snapshot 26
+      x-summary-source: derived
   /v0.1/asset-classification/filter:
     get:
       tags:
@@ -398,6 +404,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Get deep filter 26
+      x-summary-source: derived
     post:
       tags:
       - asset-classification-controller
@@ -447,6 +455,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Post deep filter 26
+      x-summary-source: derived
   /v0.1/asset-classification/symbol/{symbol}:
     get:
       tags:
@@ -517,6 +527,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Get deep symbol 26
+      x-summary-source: derived
   /v0.1/asset-classification/recent/symbol/{symbol}:
     get:
       tags:
@@ -594,10 +606,52 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/AssetClassification'
+      summary: Get recent symbol 26
+      x-summary-source: derived
 components:
   schemas:
-    Ext:
+    Map:
       type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
     AssetClassification:
       type: object
       properties:
@@ -647,6 +701,97 @@ components:
         extHash:
           type: string
           format: uuid
+    RecentSnapshotFilterParam:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    FilterParams:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        currencyCode:
+          type: string
+        countryCode:
+          type: string
+        sids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        cids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sicCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        industryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        requestType:
+          type: string
+          enum:
+          - SNAPSHOT
+          - HISTORY
+          - EMPTY
+          - RECENT
+          readOnly: true
     ApiError:
       type: object
       properties:
@@ -730,136 +875,5 @@ components:
             type: string
         exMessage:
           type: string
-    FundamentalIdentityObject:
+    Ext:
       type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
-    FilterParams:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        currencyCode:
-          type: string
-        countryCode:
-          type: string
-        sids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        cids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sicCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        industryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        requestType:
-          type: string
-          enum:
-          - SNAPSHOT
-          - HISTORY
-          - EMPTY
-          - RECENT
-          readOnly: true

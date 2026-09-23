@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
-  title: dxFeed Fundamentals Institutional Ownership Summary Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  title: dxFeed Fundamentals Institutional Ownership Summary…
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -68,6 +66,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Add manual correction 9
+      x-summary-source: derived
     delete:
       tags:
       - institutional-ownership-summary-controller
@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Add manual remove 9
+      x-summary-source: derived
   /v0.1/institutional-ownership-summary/recent/snapshot:
     get:
       tags:
@@ -214,6 +216,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Get recent snapshot 10
+      x-summary-source: derived
     post:
       tags:
       - institutional-ownership-summary-controller
@@ -269,6 +273,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Post recent snapshot 10
+      x-summary-source: derived
   /v0.1/institutional-ownership-summary/filter:
     get:
       tags:
@@ -412,6 +418,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Get deep filter 10
+      x-summary-source: derived
     post:
       tags:
       - institutional-ownership-summary-controller
@@ -461,6 +469,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Post deep filter 10
+      x-summary-source: derived
   /v0.1/institutional-ownership-summary/ymd/{ymd}:
     get:
       tags:
@@ -532,6 +542,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Get deep ymd 9
+      x-summary-source: derived
   /v0.1/institutional-ownership-summary/symbol/{symbol}:
     get:
       tags:
@@ -602,6 +614,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Get deep symbol 10
+      x-summary-source: derived
   /v0.1/institutional-ownership-summary/recent/symbol/{symbol}:
     get:
       tags:
@@ -679,10 +693,133 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/InstitutionalOwnershipSummary'
+      summary: Get recent symbol 10
+      x-summary-source: derived
 components:
   schemas:
-    Ext:
+    RecentSnapshotFilterParam:
       type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+    InstitutionalOwnershipSummary:
+      type: object
+      properties:
+        ymd:
+          type: integer
+          format: int32
+        eventTime:
+          type: integer
+          format: int64
+        dxSymbol:
+          type: string
+        sid:
+          type: string
+        institutionSharesHeld:
+          type: number
+          format: double
+        institutionPercentHeld:
+          type: number
+          format: double
+        institutionSharesBought:
+          type: number
+          format: double
+        institutionSharesSold:
+          type: number
+          format: double
+        institutionNumberOfHolders:
+          type: number
+          format: double
+        ext:
+          $ref: '#/components/schemas/Ext'
+        disabled:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
     ApiError:
       type: object
       properties:
@@ -766,129 +903,6 @@ components:
             type: string
         exMessage:
           type: string
-    FundamentalIdentityObject:
-      type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    InstitutionalOwnershipSummary:
-      type: object
-      properties:
-        ymd:
-          type: integer
-          format: int32
-        eventTime:
-          type: integer
-          format: int64
-        dxSymbol:
-          type: string
-        sid:
-          type: string
-        institutionSharesHeld:
-          type: number
-          format: double
-        institutionPercentHeld:
-          type: number
-          format: double
-        institutionSharesBought:
-          type: number
-          format: double
-        institutionSharesSold:
-          type: number
-          format: double
-        institutionNumberOfHolders:
-          type: number
-          format: double
-        ext:
-          $ref: '#/components/schemas/Ext'
-        disabled:
-          type: boolean
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
     HistoryFilterParams:
       type: object
       properties:
@@ -954,3 +968,5 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
+    Ext:
+      type: object

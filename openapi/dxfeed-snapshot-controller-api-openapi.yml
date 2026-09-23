@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
   title: dxFeed Fundamentals Snapshot Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -151,6 +149,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Get by filter 1
+      x-summary-source: derived
     post:
       tags:
       - snapshot-controller
@@ -198,6 +198,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Post by filter 1
+      x-summary-source: derived
   /v0.1/snapshot/types:
     get:
       tags:
@@ -242,50 +244,10 @@ paths:
                 type: array
                 items:
                   type: string
+      summary: Get types 1
+      x-summary-source: derived
 components:
   schemas:
-    FundamentalIdentityObject:
-      type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
     SnapshotFilterParams:
       type: object
       properties:
@@ -350,6 +312,48 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
     ApiError:
       type: object
       properties:

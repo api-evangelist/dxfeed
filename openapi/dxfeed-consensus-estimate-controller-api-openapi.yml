@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
   title: dxFeed Fundamentals Consensus Estimate Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -68,6 +66,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Add manual correction 20
+      x-summary-source: derived
     delete:
       tags:
       - consensus-estimate-controller
@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Add manual remove 20
+      x-summary-source: derived
   /v0.1/consensus-estimate/recent/snapshot:
     get:
       tags:
@@ -214,6 +216,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Get recent snapshot 22
+      x-summary-source: derived
     post:
       tags:
       - consensus-estimate-controller
@@ -269,6 +273,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Post recent snapshot 22
+      x-summary-source: derived
   /v0.1/consensus-estimate/filter:
     get:
       tags:
@@ -418,6 +424,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Get deep filter 22
+      x-summary-source: derived
     post:
       tags:
       - consensus-estimate-controller
@@ -467,6 +475,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Post deep filter 22
+      x-summary-source: derived
   /v0.1/consensus-estimate/ymd/{ymd}:
     get:
       tags:
@@ -538,6 +548,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Get deep ymd 20
+      x-summary-source: derived
   /v0.1/consensus-estimate/symbol/{symbol}:
     get:
       tags:
@@ -608,6 +620,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Get deep symbol 22
+      x-summary-source: derived
   /v0.1/consensus-estimate/recent/symbol/{symbol}:
     get:
       tags:
@@ -685,10 +699,84 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ConsensusEstimate'
+      summary: Get recent symbol 22
+      x-summary-source: derived
 components:
   schemas:
-    Ext:
+    Map:
       type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+    RecentSnapshotFilterParam:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     ApiError:
       type: object
       properties:
@@ -772,6 +860,58 @@ components:
             type: string
         exMessage:
           type: string
+    ConsensusEstimate:
+      type: object
+      properties:
+        ymd:
+          type: integer
+          format: int32
+        eventTime:
+          type: integer
+          format: int64
+        dxSymbol:
+          type: string
+        sid:
+          type: string
+        period:
+          $ref: '#/components/schemas/Period'
+        currencyCode:
+          type: string
+        referencePeriod:
+          type: string
+        adjustedEPSMean:
+          type: number
+          format: double
+        adjustedEPSMedian:
+          type: number
+          format: double
+        reportedEPSMean:
+          type: number
+          format: double
+        reportedEPSMedian:
+          type: number
+          format: double
+        ext:
+          $ref: '#/components/schemas/Ext'
+        disabled:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
     PeriodicHistoryFilterParams:
       type: object
       properties:
@@ -839,131 +979,7 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
-    FundamentalIdentityObject:
+    Ext:
       type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    ConsensusEstimate:
-      type: object
-      properties:
-        ymd:
-          type: integer
-          format: int32
-        eventTime:
-          type: integer
-          format: int64
-        dxSymbol:
-          type: string
-        sid:
-          type: string
-        period:
-          $ref: '#/components/schemas/Period'
-        currencyCode:
-          type: string
-        referencePeriod:
-          type: string
-        adjustedEPSMean:
-          type: number
-          format: double
-        adjustedEPSMedian:
-          type: number
-          format: double
-        reportedEPSMean:
-          type: number
-          format: double
-        reportedEPSMedian:
-          type: number
-          format: double
-        ext:
-          $ref: '#/components/schemas/Ext'
-        disabled:
-          type: boolean
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
     Period:
       type: object
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'

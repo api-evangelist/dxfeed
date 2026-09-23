@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
   title: dxFeed Fundamentals Symbol State Change Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -204,6 +202,8 @@ paths:
                     exYmd: 20230928
                     adjustmentValue: 2
                     srcId: ''
+      summary: Get by filter
+      x-summary-source: derived
     post:
       tags:
       - symbol-state-change-controller
@@ -290,6 +290,8 @@ paths:
                     exYmd: 20230928
                     adjustmentValue: 2
                     srcId: ''
+      summary: Post by filter
+      x-summary-source: derived
   /v0.1/symbol-state-change/types:
     get:
       tags:
@@ -334,6 +336,8 @@ paths:
                 type: array
                 items:
                   type: string
+      summary: Get types
+      x-summary-source: derived
 components:
   schemas:
     TypeSymbolStateChangeFilterParams:

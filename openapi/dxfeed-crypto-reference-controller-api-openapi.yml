@@ -1,15 +1,13 @@
 openapi: 3.2.0
 info:
   title: dxFeed Fundamentals Crypto Reference Controller API
-  description: '* [dxFeed Website](https://www.dxfeed.com/)
+  description: '* dxFeed Website
 
-    * [Knowledge Base: Fundamentals](https://kb.dxfeed.com/en/data/fundamentals.html)
+    * Knowledge Base: Fundamentals
 
-    * [Customer Ticket Portal](https://portal.dxfeed.com/)
+    * Customer Ticket Portal
 
-    * [Contact the dxFeed sales team](https://dxfeed.com/contact-sales/)
-
-    '
+    * Contact the dxFeed sales team'
 servers:
 - url: https://tools.dxfeed.com/fs
   description: Generated server url
@@ -68,6 +66,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Add manual correction 17
+      x-summary-source: derived
     delete:
       tags:
       - crypto-reference-controller
@@ -119,6 +119,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Add manual remove 17
+      x-summary-source: derived
   /v0.1/crypto-reference/recent/snapshot:
     get:
       tags:
@@ -214,6 +216,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Get recent snapshot 19
+      x-summary-source: derived
     post:
       tags:
       - crypto-reference-controller
@@ -269,6 +273,8 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/Map'
+      summary: Post recent snapshot 19
+      x-summary-source: derived
   /v0.1/crypto-reference/filter:
     get:
       tags:
@@ -398,6 +404,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Get deep filter 19
+      x-summary-source: derived
     post:
       tags:
       - crypto-reference-controller
@@ -447,6 +455,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Post deep filter 19
+      x-summary-source: derived
   /v0.1/crypto-reference/symbol/{symbol}:
     get:
       tags:
@@ -517,6 +527,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Get deep symbol 19
+      x-summary-source: derived
   /v0.1/crypto-reference/recent/symbol/{symbol}:
     get:
       tags:
@@ -594,10 +606,143 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/CryptoReference'
+      summary: Get recent symbol 19
+      x-summary-source: derived
 components:
   schemas:
-    Ext:
+    RecentSnapshotFilterParam:
       type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+    FilterParams:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        currencyCode:
+          type: string
+        countryCode:
+          type: string
+        sids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        cids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sicCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        industryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        requestType:
+          type: string
+          enum:
+          - SNAPSHOT
+          - HISTORY
+          - EMPTY
+          - RECENT
+          readOnly: true
     ApiError:
       type: object
       properties:
@@ -681,42 +826,6 @@ components:
             type: string
         exMessage:
           type: string
-    FundamentalIdentityObject:
-      type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
     CryptoReference:
       type: object
       properties:
@@ -760,100 +869,5 @@ components:
         extHash:
           type: string
           format: uuid
-    RecentSnapshotFilterParam:
+    Ext:
       type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
-    FilterParams:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        currencyCode:
-          type: string
-        countryCode:
-          type: string
-        sids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        cids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sicCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        industryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        requestType:
-          type: string
-          enum:
-          - SNAPSHOT
-          - HISTORY
-          - EMPTY
-          - RECENT
-          readOnly: true
