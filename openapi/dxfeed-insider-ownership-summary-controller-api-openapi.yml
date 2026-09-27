@@ -697,7 +697,7 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    RecentSnapshotFilterParam:
+    HistoryFilterParams:
       type: object
       properties:
         mics:
@@ -724,17 +724,44 @@ components:
             - TEW
             - CMC
           uniqueItems: true
-        countryCodes:
+        currencyCode:
+          type: string
+        countryCode:
+          type: string
+        sids:
           type: array
           items:
             type: string
           uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
+        cids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sicCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        industryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        fromYmd:
+          type: string
+          description: request from date in yyyymmdd format, inclusive
+        toYmd:
+          type: string
+          description: request to date in yyyymmdd format, inclusive
+        requestType:
+          type: string
+          enum:
+          - SNAPSHOT
+          - HISTORY
+          - EMPTY
+          - RECENT
+          readOnly: true
     FundamentalIdentityObject:
       type: object
       discriminator:
@@ -854,7 +881,7 @@ components:
             type: string
         exMessage:
           type: string
-    HistoryFilterParams:
+    RecentSnapshotFilterParam:
       type: object
       properties:
         mics:
@@ -881,44 +908,19 @@ components:
             - TEW
             - CMC
           uniqueItems: true
-        currencyCode:
-          type: string
-        countryCode:
-          type: string
-        sids:
+        countryCodes:
           type: array
           items:
             type: string
           uniqueItems: true
-        cids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sicCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        industryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        fromYmd:
-          type: string
-          description: request from date in yyyymmdd format, inclusive
-        toYmd:
-          type: string
-          description: request to date in yyyymmdd format, inclusive
-        requestType:
-          type: string
-          enum:
-          - SNAPSHOT
-          - HISTORY
-          - EMPTY
-          - RECENT
-          readOnly: true
+    Ext:
+      type: object
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
     InsiderOwnershipSummary:
       type: object
       properties:
@@ -971,5 +973,3 @@ components:
         extHash:
           type: string
           format: uuid
-    Ext:
-      type: object

@@ -14,16 +14,20 @@ description: dxFeed is a market data distributor and subsidiary of Devexperts, h
   endpoint), a binary QD protocol over TCP, FIX, file-based historical/tick data
   extraction, and Java/C++/.NET/Swift/Go/JavaScript/Python client libraries.
 deliveryModel:
-  model: unknown
+  model: saas
+  license_evidence:
+    not_product:
+    - dxfeed/dxlink
   open_source: unknown
   commercial: true
-  callable_host: false
-  label: Delivery model not determined — needs a product licence on record
+  callable_host: true
+  label: Hosted service · you call their endpoint
   confidence: low
   source:
+  - openapi
   - pricing
-  - repository-unlicensed
-  generated: '2026-08-28'
+  - repository-not-product
+  generated: '2026-09-25'
   method: derived
 accessModel:
   pricing: unknown
@@ -41,7 +45,7 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/dxfeed.png
 tags:
-- Financial
+- Finance
 - Market Data
 - Real-Time
 - Historical Data
