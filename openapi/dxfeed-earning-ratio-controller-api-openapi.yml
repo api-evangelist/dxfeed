@@ -703,6 +703,48 @@ paths:
       x-summary-source: derived
 components:
   schemas:
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
+    RecentSnapshotFilterParam:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+    Period:
+      type: object
+    Ext:
+      type: object
     FundamentalIdentityObject:
       type: object
       discriminator:
@@ -849,48 +891,6 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Period:
-      type: object
-    Ext:
-      type: object
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
     ApiError:
       type: object
       properties:
