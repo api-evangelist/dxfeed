@@ -703,12 +703,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
     RecentSnapshotFilterParam:
       type: object
       properties:
@@ -741,10 +735,12 @@ components:
           items:
             type: string
           uniqueItems: true
-    Period:
+    Map:
       type: object
-    Ext:
-      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
     FundamentalIdentityObject:
       type: object
       discriminator:
@@ -781,49 +777,10 @@ components:
           type: string
       required:
       - name
-    EarningRatio:
+    Period:
       type: object
-      properties:
-        ymd:
-          type: integer
-          format: int32
-        eventTime:
-          type: integer
-          format: int64
-        dxSymbol:
-          type: string
-        sid:
-          type: string
-        period:
-          $ref: '#/components/schemas/Period'
-        reportType:
-          type: string
-        reportSubType:
-          type: string
-        normalizedBasicEPSGrowth:
-          type: number
-          format: double
-        ext:
-          $ref: '#/components/schemas/Ext'
-        disabled:
-          type: boolean
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
+    Ext:
+      type: object
     PeriodicHistoryFilterParams:
       type: object
       properties:
@@ -891,6 +848,49 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
+    EarningRatio:
+      type: object
+      properties:
+        ymd:
+          type: integer
+          format: int32
+        eventTime:
+          type: integer
+          format: int64
+        dxSymbol:
+          type: string
+        sid:
+          type: string
+        period:
+          $ref: '#/components/schemas/Period'
+        reportType:
+          type: string
+        reportSubType:
+          type: string
+        normalizedBasicEPSGrowth:
+          type: number
+          format: double
+        ext:
+          $ref: '#/components/schemas/Ext'
+        disabled:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
     ApiError:
       type: object
       properties:

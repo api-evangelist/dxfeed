@@ -703,12 +703,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
     RecentSnapshotFilterParam:
       type: object
       properties:
@@ -803,10 +797,12 @@ components:
         extHash:
           type: string
           format: uuid
-    Period:
+    Map:
       type: object
-    Ext:
-      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
     FundamentalIdentityObject:
       type: object
       discriminator:
@@ -843,6 +839,10 @@ components:
           type: string
       required:
       - name
+    Period:
+      type: object
+    Ext:
+      type: object
     PeriodicHistoryFilterParams:
       type: object
       properties:
