@@ -67,7 +67,7 @@ tags_raw:
 - Reference Data
 - Fundamentals
 created: '2026-07-21'
-modified: '2026-07-22'
+modified: '2026-10-06'
 specificationVersion: '0.23'
 apis:
 - aid: dxfeed:dxfeed-rest-api
@@ -630,6 +630,10 @@ apis:
   - type: DataModel
     url: data-model/dxfeed-data-model.yml
 common:
+- url: https://dxfeed.com/articles/
+  type: Blog
+- url: https://dxfeed.com/articles/feed/
+  type: BlogRSS
 - type: Overlay
   url: overlays/dxfeed-fundamentals-overlay.yaml
 - type: X-MCPServerCandidate
