@@ -340,76 +340,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    TypeSymbolStateChangeFilterParams:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        currencyCode:
-          type: string
-        countryCode:
-          type: string
-        sids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        cids:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sicCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        industryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        fromYmd:
-          type: string
-          description: request from date in yyyymmdd format, inclusive
-        toYmd:
-          type: string
-          description: request to date in yyyymmdd format, inclusive
-        types:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        requestType:
-          type: string
-          enum:
-          - SNAPSHOT
-          - HISTORY
-          - EMPTY
-          - RECENT
-          readOnly: true
     ApiError:
       type: object
       properties:
@@ -493,3 +423,73 @@ components:
             type: string
         exMessage:
           type: string
+    TypeSymbolStateChangeFilterParams:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        currencyCode:
+          type: string
+        countryCode:
+          type: string
+        sids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        cids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sicCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        industryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        fromYmd:
+          type: string
+          description: request from date in yyyymmdd format, inclusive
+        toYmd:
+          type: string
+          description: request to date in yyyymmdd format, inclusive
+        types:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        requestType:
+          type: string
+          enum:
+          - SNAPSHOT
+          - HISTORY
+          - EMPTY
+          - RECENT
+          readOnly: true

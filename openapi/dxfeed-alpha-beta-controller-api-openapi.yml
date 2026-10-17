@@ -703,126 +703,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
-    FundamentalIdentityObject:
-      type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    Period:
-      type: object
-    Ext:
-      type: object
-    AlphaBeta:
-      type: object
-      properties:
-        ymd:
-          type: integer
-          format: int32
-        eventTime:
-          type: integer
-          format: int64
-        dxSymbol:
-          type: string
-        sid:
-          type: string
-        period:
-          $ref: '#/components/schemas/Period'
-        alpha:
-          type: number
-          format: double
-        beta:
-          type: number
-          format: double
-        ext:
-          $ref: '#/components/schemas/Ext'
-        disabled:
-          type: boolean
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
     PeriodicHistoryFilterParams:
       type: object
       properties:
@@ -890,6 +770,40 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
+    Ext:
+      type: object
+    RecentSnapshotFilterParam:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     ApiError:
       type: object
       properties:
@@ -973,3 +887,89 @@ components:
             type: string
         exMessage:
           type: string
+    Period:
+      type: object
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+    AlphaBeta:
+      type: object
+      properties:
+        ymd:
+          type: integer
+          format: int32
+        eventTime:
+          type: integer
+          format: int64
+        dxSymbol:
+          type: string
+        sid:
+          type: string
+        period:
+          $ref: '#/components/schemas/Period'
+        alpha:
+          type: number
+          format: double
+        beta:
+          type: number
+          format: double
+        ext:
+          $ref: '#/components/schemas/Ext'
+        disabled:
+          type: boolean
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'

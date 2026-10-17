@@ -703,84 +703,6 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    RecentSnapshotFilterParam:
-      type: object
-      properties:
-        mics:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        symbols:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        sources:
-          type: array
-          items:
-            type: string
-            enum:
-            - MORNINGSTAR
-            - EDI
-            - MSWEB
-            - VERDA
-            - DXFINA
-            - DXFEED
-            - TEW
-            - CMC
-          uniqueItems: true
-        countryCodes:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-    Map:
-      type: object
-      additionalProperties:
-        type: array
-        items:
-          $ref: '#/components/schemas/FundamentalIdentityObject'
-    FundamentalIdentityObject:
-      type: object
-      discriminator:
-        propertyName: name
-      properties:
-        dxSymbol:
-          type: string
-        source:
-          type: string
-          enum:
-          - MORNINGSTAR
-          - EDI
-          - MSWEB
-          - VERDA
-          - DXFINA
-          - DXFEED
-          - TEW
-          - CMC
-        disabled:
-          type: boolean
-        eventTime:
-          type: integer
-          format: int64
-        sid:
-          type: string
-        ext: {}
-        id:
-          type: integer
-          format: int64
-        extHash:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - name
-    Period:
-      type: object
-    Ext:
-      type: object
     PeriodicHistoryFilterParams:
       type: object
       properties:
@@ -848,6 +770,8 @@ components:
           - EMPTY
           - RECENT
           readOnly: true
+    Ext:
+      type: object
     EarningRatio:
       type: object
       properties:
@@ -891,6 +815,38 @@ components:
         extHash:
           type: string
           format: uuid
+    RecentSnapshotFilterParam:
+      type: object
+      properties:
+        mics:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        symbols:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        sources:
+          type: array
+          items:
+            type: string
+            enum:
+            - MORNINGSTAR
+            - EDI
+            - MSWEB
+            - VERDA
+            - DXFINA
+            - DXFEED
+            - TEW
+            - CMC
+          uniqueItems: true
+        countryCodes:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     ApiError:
       type: object
       properties:
@@ -974,3 +930,47 @@ components:
             type: string
         exMessage:
           type: string
+    FundamentalIdentityObject:
+      type: object
+      discriminator:
+        propertyName: name
+      properties:
+        dxSymbol:
+          type: string
+        source:
+          type: string
+          enum:
+          - MORNINGSTAR
+          - EDI
+          - MSWEB
+          - VERDA
+          - DXFINA
+          - DXFEED
+          - TEW
+          - CMC
+        disabled:
+          type: boolean
+        eventTime:
+          type: integer
+          format: int64
+        sid:
+          type: string
+        ext: {}
+        id:
+          type: integer
+          format: int64
+        extHash:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - name
+    Period:
+      type: object
+    Map:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/FundamentalIdentityObject'
